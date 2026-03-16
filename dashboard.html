@@ -1,105 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard – Built Daily</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Set Up Your Profile — Built Daily</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-  <!-- Navigation -->
-  <nav>
-    <a href="index.html" class="logo">Built Daily</a>
-    <ul class="nav-links">
-      <li><a href="dashboard.html" class="active">Dashboard</a></li>
-      <li><a href="log.html">Log Today</a></li>
-      <li><a href="profile.html">Profile</a></li>
-      <li><a href="#" id="logout-btn">Logout</a></li>
-    </ul>
-  </nav>
-
-  <!-- Dashboard Content -->
-  <div class="container">
-
-    <div class="page-header">
-      <h1 id="dash-greeting">Welcome back 👋</h1>
-      <p>Here's your nutrition summary for today.</p>
+  <!-- Header (Authenticated Nav) -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="dashboard.html" class="logo">
+        <span class="logo-mark"></span>
+        Built Daily
+      </a>
+      <nav class="nav-desktop">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="profile.html" class="active">Profile</a>
+        <a href="log.html">Log Food</a>
+        <a href="index.html">Logout</a>
+      </nav>
+      <button class="hamburger" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
+    <nav class="nav-mobile">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="profile.html" class="active">Profile</a>
+      <a href="log.html">Log Food</a>
+      <a href="index.html">Logout</a>
+    </nav>
+  </header>
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">Calories Consumed</div>
-        <div class="stat-value" id="dash-calories-consumed">–</div>
-        <div class="stat-unit">of <span id="dash-calories-target">–</span> kcal</div>
-        <div class="progress-bar-wrap">
-          <div class="progress-bar" id="dash-calories-bar" style="width:0%"></div>
+  <!-- Main -->
+  <main>
+    <div class="profile-wrapper">
+      <div class="profile-card">
+        <h1 class="page-title animate-in">Set Up Your Profile</h1>
+        <p class="page-subtitle animate-in delay-1">
+          Tell us a little about yourself so we can calculate your daily calorie target and track your progress accurately.
+        </p>
+
+        <div class="card card-elevated animate-in delay-2">
+          <form id="profile-form">
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="age" class="form-label">Age</label>
+                <input type="number" id="age" class="form-input" placeholder="e.g. 28" min="13" max="120" required>
+              </div>
+
+              <div class="form-group">
+                <label for="sex" class="form-label">Sex</label>
+                <select id="sex" class="form-select" required>
+                  <option value="" disabled selected>Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="height" class="form-label">Height (cm)</label>
+              <input type="number" id="height" class="form-input" placeholder="e.g. 178" min="100" max="250" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="current-weight" class="form-label">Current Weight (kg)</label>
+                <input type="number" id="current-weight" class="form-input" placeholder="e.g. 85" min="30" max="300" step="0.1" required>
+              </div>
+
+              <div class="form-group">
+                <label for="goal-weight" class="form-label">Goal Weight (kg)</label>
+                <input type="number" id="goal-weight" class="form-input" placeholder="e.g. 78" min="30" max="300" step="0.1" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="activity" class="form-label">Activity Level</label>
+              <select id="activity" class="form-select" required>
+                <option value="" disabled selected>Select your activity level</option>
+                <option value="1.2">Sedentary (little or no exercise)</option>
+                <option value="1.375">Lightly Active (1–3 days/week)</option>
+                <option value="1.55">Moderately Active (3–5 days/week)</option>
+                <option value="1.725">Very Active (6–7 days/week)</option>
+                <option value="1.9">Extremely Active (physical job + training)</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-top: var(--space-lg);">
+              <button type="submit" class="btn btn-primary btn-full">Save Profile</button>
+            </div>
+          </form>
         </div>
-      </div>
 
-      <div class="stat-card">
-        <div class="stat-label">Remaining Calories</div>
-        <div class="stat-value" id="dash-calories-remaining">–</div>
-        <div class="stat-unit">kcal left today</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-label">Protein</div>
-        <div class="stat-value" id="dash-protein">–</div>
-        <div class="stat-unit">grams today</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-label">Carbs</div>
-        <div class="stat-value" id="dash-carbs">–</div>
-        <div class="stat-unit">grams today</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-label">Fat</div>
-        <div class="stat-value" id="dash-fat">–</div>
-        <div class="stat-unit">grams today</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-label">Water</div>
-        <div class="stat-value" id="dash-water">–</div>
-        <div class="stat-unit">glasses today</div>
-        <div class="progress-bar-wrap">
-          <div class="progress-bar" id="dash-water-bar" style="width:0%"></div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-label">Current Streak</div>
-        <div class="stat-value" id="dash-streak">–</div>
-        <div class="stat-unit">days in a row 🔥</div>
+        <p class="form-helper-bottom text-muted animate-in delay-3">
+          Your information is used to calculate your estimated calorie needs and personalize your dashboard.
+        </p>
       </div>
     </div>
-
-    <!-- Quick Actions -->
-    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:2rem">
-      <a href="log.html" class="btn btn-primary">+ Log Today's Nutrition</a>
-      <a href="profile.html" class="btn btn-secondary">Edit Profile</a>
-    </div>
-
-    <!-- Recent Logs -->
-    <div class="card">
-      <h2>Recent Logs</h2>
-      <ul class="log-list" id="recent-logs-list">
-        <li class="text-muted" style="padding:0.85rem 0">Loading…</li>
-      </ul>
-    </div>
-
-  </div>
+  </main>
 
   <!-- Footer -->
-  <footer>
-    <p>&copy; 2026 Built Daily. All rights reserved.</p>
+  <footer class="site-footer">
+    <p class="footer-name">Built Daily</p>
+    <p class="footer-note">Discipline. Consistency. Progress.</p>
   </footer>
 
-  <script src="js/auth.js"></script>
-  <script src="js/dashboard.js"></script>
+  <script src="js/nav.js"></script>
 </body>
 </html>
