@@ -302,6 +302,7 @@ main {
 }
 
 .nav-mobile.open {
+  display: block;
   transform: translateY(0);
   opacity: 1;
   pointer-events: auto;
@@ -567,7 +568,8 @@ main {
 /* Landing hero */
 .hero {
   text-align: center;
-  padding: var(--space-2xl) 0;
+  padding-top: var(--space-2xl);
+  padding-bottom: var(--space-2xl);
   position: relative;
 }
 
@@ -609,7 +611,8 @@ main {
 
 /* Supporting section on landing */
 .landing-section {
-  padding: var(--space-xl) 0 var(--space-2xl);
+  padding-top: var(--space-xl);
+  padding-bottom: var(--space-2xl);
   text-align: center;
 }
 
@@ -919,7 +922,6 @@ main {
 
   .hero .hero-subtitle {
     font-size: 1rem;
-    padding: 0 var(--space-sm);
   }
 
   .page-header {
