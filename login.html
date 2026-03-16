@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log In – Built Daily</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="index.html" class="logo">Built Daily</a>
+    <ul class="nav-links">
+      <li><a href="signup.html">Don't have an account? Sign up</a></li>
+    </ul>
+  </nav>
+
+  <!-- Login Form -->
+  <div class="container--narrow" style="margin-top:3rem">
+    <div class="card">
+      <h2>Welcome back</h2>
+
+      <div id="login-alert" class="alert"></div>
+
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="jane@example.com" autocomplete="email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Your password" autocomplete="current-password" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full mt-2">Log In</button>
+      </form>
+
+      <p class="form-footer mt-2">
+        Don't have an account? <a href="signup.html">Sign up</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+</body>
+</html>

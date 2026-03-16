@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log Nutrition – Built Daily</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="index.html" class="logo">Built Daily</a>
+    <ul class="nav-links">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="log.html" class="active">Log Today</a></li>
+      <li><a href="profile.html">Profile</a></li>
+      <li><a href="#" id="logout-btn">Logout</a></li>
+    </ul>
+  </nav>
+
+  <!-- Log Form -->
+  <div class="container" style="max-width:560px; margin-top:2.5rem">
+
+    <div class="page-header">
+      <h1>Daily Nutrition Log</h1>
+      <p id="calorie-target-info" class="text-muted">Log today's intake to stay on track.</p>
+    </div>
+
+    <div class="card">
+      <div id="log-alert" class="alert"></div>
+
+      <form id="log-form" novalidate>
+
+        <div class="form-group">
+          <label for="log-calories">Calories (kcal)</label>
+          <input type="number" id="log-calories" name="calories" min="0" step="1" placeholder="e.g. 500" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="log-protein">Protein (g)</label>
+            <input type="number" id="log-protein" name="protein" min="0" step="0.1" placeholder="e.g. 40" required />
+          </div>
+          <div class="form-group">
+            <label for="log-carbs">Carbohydrates (g)</label>
+            <input type="number" id="log-carbs" name="carbs" min="0" step="0.1" placeholder="e.g. 60" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="log-fat">Fat (g)</label>
+            <input type="number" id="log-fat" name="fat" min="0" step="0.1" placeholder="e.g. 15" required />
+          </div>
+          <div class="form-group">
+            <label for="log-water">Water (glasses)</label>
+            <input type="number" id="log-water" name="water" min="0" max="30" step="1" placeholder="e.g. 8" required />
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <button type="submit" class="btn btn-success btn-full">Save Today's Log</button>
+      </form>
+    </div>
+
+    <p class="text-center text-muted mt-2" style="font-size:0.85rem">
+      Submitting will overwrite any existing entry for today.
+    </p>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 Built Daily. All rights reserved.</p>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script src="js/log.js"></script>
+</body>
+</html>

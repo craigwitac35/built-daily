@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard – Built Daily</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="index.html" class="logo">Built Daily</a>
+    <ul class="nav-links">
+      <li><a href="dashboard.html" class="active">Dashboard</a></li>
+      <li><a href="log.html">Log Today</a></li>
+      <li><a href="profile.html">Profile</a></li>
+      <li><a href="#" id="logout-btn">Logout</a></li>
+    </ul>
+  </nav>
+
+  <!-- Dashboard Content -->
+  <div class="container">
+
+    <div class="page-header">
+      <h1 id="dash-greeting">Welcome back 👋</h1>
+      <p>Here's your nutrition summary for today.</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Calories Consumed</div>
+        <div class="stat-value" id="dash-calories-consumed">–</div>
+        <div class="stat-unit">of <span id="dash-calories-target">–</span> kcal</div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="dash-calories-bar" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Remaining Calories</div>
+        <div class="stat-value" id="dash-calories-remaining">–</div>
+        <div class="stat-unit">kcal left today</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Protein</div>
+        <div class="stat-value" id="dash-protein">–</div>
+        <div class="stat-unit">grams today</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Carbs</div>
+        <div class="stat-value" id="dash-carbs">–</div>
+        <div class="stat-unit">grams today</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Fat</div>
+        <div class="stat-value" id="dash-fat">–</div>
+        <div class="stat-unit">grams today</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Water</div>
+        <div class="stat-value" id="dash-water">–</div>
+        <div class="stat-unit">glasses today</div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="dash-water-bar" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Current Streak</div>
+        <div class="stat-value" id="dash-streak">–</div>
+        <div class="stat-unit">days in a row 🔥</div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:2rem">
+      <a href="log.html" class="btn btn-primary">+ Log Today's Nutrition</a>
+      <a href="profile.html" class="btn btn-secondary">Edit Profile</a>
+    </div>
+
+    <!-- Recent Logs -->
+    <div class="card">
+      <h2>Recent Logs</h2>
+      <ul class="log-list" id="recent-logs-list">
+        <li class="text-muted" style="padding:0.85rem 0">Loading…</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 Built Daily. All rights reserved.</p>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
