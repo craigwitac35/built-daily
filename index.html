@@ -1,63 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Built Daily – Track. Build. Grow.</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Built Daily — Discipline Builds Results</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-  <!-- Navigation -->
-  <nav>
-    <span class="logo">Built Daily</span>
-    <ul class="nav-links">
-      <li><a href="login.html">Login</a></li>
-      <li><a href="signup.html"><button class="btn btn-primary" style="padding:0.45rem 1rem;font-size:0.88rem">Get Started</button></a></li>
-    </ul>
-  </nav>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-mark"></span>
+        Built Daily
+      </a>
+      <nav class="nav-desktop">
+        <a href="login.html">Log In</a>
+        <a href="signup.html" class="btn btn-primary btn-sm">Create Account</a>
+      </nav>
+      <button class="hamburger" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <nav class="nav-mobile">
+      <a href="login.html">Log In</a>
+      <a href="signup.html">Create Account</a>
+    </nav>
+  </header>
 
-  <!-- Hero -->
-  <section class="hero">
-    <h1>Track. Build. Grow.</h1>
-    <p>
-      Built Daily is your personal fitness and nutrition companion.
-      Set your goals, log your meals, and watch your progress every single day.
-    </p>
-    <div class="hero-actions">
-      <a href="signup.html" class="btn btn-primary">Start for Free</a>
-      <a href="login.html" class="btn btn-secondary">Log In</a>
-    </div>
-  </section>
+  <!-- Main -->
+  <main>
 
-  <!-- Features -->
-  <section class="features">
-    <div class="feature-card">
-      <div class="icon">🎯</div>
-      <h3>Smart Calorie Targets</h3>
-      <p>We calculate your personalised daily calorie goal based on your body stats and activity level.</p>
-    </div>
-    <div class="feature-card">
-      <div class="icon">🥗</div>
-      <h3>Daily Nutrition Logging</h3>
-      <p>Log calories, protein, carbs, fat, and water intake in seconds to stay on track every day.</p>
-    </div>
-    <div class="feature-card">
-      <div class="icon">📊</div>
-      <h3>Progress Dashboard</h3>
-      <p>Visualise your streak, remaining calories, and macro breakdowns from one clean dashboard.</p>
-    </div>
-    <div class="feature-card">
-      <div class="icon">🔒</div>
-      <h3>Secure &amp; Private</h3>
-      <p>Your data stays yours. Built Daily is designed to connect to a secure backend like Supabase.</p>
-    </div>
-  </section>
+    <!-- Hero -->
+    <section class="hero container">
+      <h1 class="animate-in">Discipline Builds Results.<br>Track It Daily.</h1>
+      <p class="hero-subtitle animate-in delay-1">
+        Built Daily helps you track nutrition, weight, and habits with clarity.
+        Simple tools designed to help you stay accountable and reach your goals.
+      </p>
+      <div class="hero-ctas animate-in delay-2">
+        <a href="signup.html" class="btn btn-primary">Create Account</a>
+        <a href="login.html" class="btn btn-ghost">Log In</a>
+      </div>
+    </section>
+
+    <!-- Supporting Section -->
+    <section class="landing-section container">
+      <div class="animate-in delay-3">
+        <p>
+          Progress doesn't happen by accident.
+          When you track the small things every day, the big results follow.
+        </p>
+        <br>
+        <p>
+          Built Daily gives you a simple system to log your nutrition,
+          track your progress, and stay consistent.
+        </p>
+      </div>
+    </section>
+
+  </main>
 
   <!-- Footer -->
-  <footer>
-    <p>&copy; 2026 Built Daily. All rights reserved.</p>
+  <footer class="site-footer">
+    <p class="footer-name">Built Daily</p>
+    <p class="footer-note">Discipline. Consistency. Progress.</p>
   </footer>
 
+  <script src="js/nav.js"></script>
 </body>
 </html>
