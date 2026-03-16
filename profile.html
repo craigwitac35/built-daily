@@ -1,86 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Profile Setup – Built Daily</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Set Up Your Profile — Built Daily</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-  <!-- Navigation -->
-  <nav>
-    <a href="index.html" class="logo">Built Daily</a>
-    <ul class="nav-links">
-      <li><a href="dashboard.html">Dashboard</a></li>
-      <li><a href="log.html">Log Today</a></li>
-      <li><a href="#" id="logout-btn">Logout</a></li>
-    </ul>
-  </nav>
-
-  <!-- Profile Form -->
-  <div class="container" style="max-width:600px; margin-top:2.5rem">
-    <div class="page-header">
-      <h1>Profile Setup</h1>
-      <p>Tell us about yourself so we can calculate your calorie target.</p>
+  <!-- Header (Authenticated Nav) -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="dashboard.html" class="logo">
+        <span class="logo-mark"></span>
+        Built Daily
+      </a>
+      <nav class="nav-desktop">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="profile.html" class="active">Profile</a>
+        <a href="log.html">Log Food</a>
+        <a href="index.html">Logout</a>
+      </nav>
+      <button class="hamburger" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
+    <nav class="nav-mobile">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="profile.html" class="active">Profile</a>
+      <a href="log.html">Log Food</a>
+      <a href="index.html">Logout</a>
+    </nav>
+  </header>
 
-    <div class="card">
-      <div id="profile-alert" class="alert"></div>
+  <!-- Main -->
+  <main>
+    <div class="profile-wrapper">
+      <div class="profile-card">
+        <h1 class="page-title animate-in">Set Up Your Profile</h1>
+        <p class="page-subtitle animate-in delay-1">
+          Tell us a little about yourself so we can calculate your daily calorie target and track your progress accurately.
+        </p>
 
-      <form id="profile-form" novalidate>
+        <div class="card card-elevated animate-in delay-2">
+          <form id="profile-form">
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="age">Age</label>
-            <input type="number" id="age" name="age" min="10" max="120" placeholder="e.g. 28" required />
-          </div>
-          <div class="form-group">
-            <label for="sex">Sex</label>
-            <select id="sex" name="sex" required>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-            </select>
-          </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="age" class="form-label">Age</label>
+                <input type="number" id="age" class="form-input" placeholder="e.g. 28" min="13" max="120" required>
+              </div>
+
+              <div class="form-group">
+                <label for="sex" class="form-label">Sex</label>
+                <select id="sex" class="form-select" required>
+                  <option value="" disabled selected>Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="height" class="form-label">Height (cm)</label>
+              <input type="number" id="height" class="form-input" placeholder="e.g. 178" min="100" max="250" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="current-weight" class="form-label">Current Weight (kg)</label>
+                <input type="number" id="current-weight" class="form-input" placeholder="e.g. 85" min="30" max="300" step="0.1" required>
+              </div>
+
+              <div class="form-group">
+                <label for="goal-weight" class="form-label">Goal Weight (kg)</label>
+                <input type="number" id="goal-weight" class="form-input" placeholder="e.g. 78" min="30" max="300" step="0.1" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="activity" class="form-label">Activity Level</label>
+              <select id="activity" class="form-select" required>
+                <option value="" disabled selected>Select your activity level</option>
+                <option value="1.2">Sedentary (little or no exercise)</option>
+                <option value="1.375">Lightly Active (1–3 days/week)</option>
+                <option value="1.55">Moderately Active (3–5 days/week)</option>
+                <option value="1.725">Very Active (6–7 days/week)</option>
+                <option value="1.9">Extremely Active (physical job + training)</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-top: var(--space-lg);">
+              <button type="submit" class="btn btn-primary btn-full">Save Profile</button>
+            </div>
+          </form>
         </div>
 
-        <div class="form-group">
-          <label for="height">Height (cm)</label>
-          <input type="number" id="height" name="height" min="100" max="250" step="0.1" placeholder="e.g. 175" required />
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="current-weight">Current Weight (kg)</label>
-            <input type="number" id="current-weight" name="current-weight" min="30" max="350" step="0.1" placeholder="e.g. 80" required />
-          </div>
-          <div class="form-group">
-            <label for="goal-weight">Goal Weight (kg)</label>
-            <input type="number" id="goal-weight" name="goal-weight" min="30" max="350" step="0.1" placeholder="e.g. 75" required />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="activity-level">Activity Level</label>
-          <select id="activity-level" name="activity-level" required>
-            <option value="sedentary">Sedentary (desk job, little exercise)</option>
-            <option value="light">Lightly Active (1–3 days/week)</option>
-            <option value="moderate" selected>Moderately Active (3–5 days/week)</option>
-            <option value="active">Very Active (6–7 days/week)</option>
-            <option value="very-active">Extremely Active (hard training + physical job)</option>
-          </select>
-        </div>
-
-        <hr class="divider" />
-
-        <div id="calorie-target-display" class="alert alert-success" style="display:none"></div>
-
-        <button type="submit" class="btn btn-success btn-full">Save Profile &amp; Calculate Target</button>
-      </form>
+        <p class="form-helper-bottom text-muted animate-in delay-3">
+          Your information is used to calculate your estimated calorie needs and personalize your dashboard.
+        </p>
+      </div>
     </div>
-  </div>
+  </main>
 
-  <script src="js/auth.js"></script>
-  <script src="js/profile.js"></script>
+  <!-- Footer -->
+  <footer class="site-footer">
+    <p class="footer-name">Built Daily</p>
+    <p class="footer-note">Discipline. Consistency. Progress.</p>
+  </footer>
+
+  <script src="js/nav.js"></script>
 </body>
 </html>
