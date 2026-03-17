@@ -302,6 +302,7 @@ main {
 }
 
 .nav-mobile.open {
+  display: block;
   transform: translateY(0);
   opacity: 1;
   pointer-events: auto;
@@ -962,6 +963,9 @@ main {
 
   .nav-mobile {
     display: block;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
   }
 
   .form-row {
