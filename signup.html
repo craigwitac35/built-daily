@@ -42,7 +42,6 @@
         </p>
 
         <div class="card card-elevated animate-in delay-2">
-          <!-- Alert -->
           <div id="signup-alert" class="alert"></div>
 
           <form id="signup-form">
@@ -86,6 +85,10 @@
   </footer>
 
   <script src="js/nav.js"></script>
-  <script src="js/auth.js"></script>
+  <script type="module" src="js/auth.js"></script>
+  <script type="module">
+    import { redirectIfLoggedIn } from './js/auth.js';
+    redirectIfLoggedIn();
+  </script>
 </body>
 </html>
