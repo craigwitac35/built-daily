@@ -1,81 +1,18 @@
 /**
- * dashboard.js – Dashboard summary helpers.
+ * dashboard.js – Dashboard with Supabase data.
  *
- * Reads today's log and profile data from localStorage
- * (swap for a real API / Supabase query when ready).
+ * Reads profile and daily logs from Supabase to populate
+ * all dashboard stat cards, progress bars, and recent logs.
  */
 
-'use strict';
+import { supabase } from './supabase.js';
+import { requireAuth } from './auth.js';
 
-// ── Data Helpers ───────────────────────────────────────────────
+// ── Helpers ────────────────────────────────────────────────────
 
-/** Return today's date string in YYYY-MM-DD format. */
 function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }
-
-/** Load the user profile stored by profile.js. */
-function getProfile() {
-  try {
-    return JSON.parse(localStorage.getItem('bd_profile')) || {};
-  } catch {
-    return {};
-  }
-}
-
-/** Load all log entries stored by log.js. */
-function getAllLogs() {
-  try {
-    return JSON.parse(localStorage.getItem('bd_logs')) || {};
-  } catch {
-    return {};
-  }
-}
-
-/** Return the log entry for a given date key, or empty defaults. */
-function getLogForDate(dateKey) {
-  const logs = getAllLogs();
-  return logs[dateKey] || { calories: 0, protein: 0, carbs: 0, fat: 0, water: 0 };
-}
-
-// ── Dashboard Render ───────────────────────────────────────────
-
-/**
- * Populate all dashboard stat cards and progress bars.
- * Called automatically on DOMContentLoaded.
- */
-function renderDashboard() {
-  const profile   = getProfile();
-  const todayLog  = getLogForDate(todayKey());
-  const allLogs   = getAllLogs();
-  const target    = profile.calorieTarget || 2000;
-
-  // ── Welcome message
-  updateText('dash-greeting', getGreeting());
-
-  // ── Calorie stats
-  updateText('dash-calories-consumed', todayLog.calories);
-  updateText('dash-calories-target',   target);
-  updateText('dash-calories-remaining', Math.max(0, target - todayLog.calories));
-  setProgressBar('dash-calories-bar', todayLog.calories, target);
-
-  // ── Macro stats
-  updateText('dash-protein', todayLog.protein);
-  updateText('dash-carbs',   todayLog.carbs);
-  updateText('dash-fat',     todayLog.fat);
-
-  // ── Water
-  updateText('dash-water', todayLog.water);
-  setProgressBar('dash-water-bar', todayLog.water, 8); // 8 glasses default goal
-
-  // ── Streak
-  updateText('dash-streak', calculateStreak(allLogs));
-
-  // ── Recent logs list
-  renderRecentLogs(allLogs);
-}
-
-// ── Helpers ────────────────────────────────────────────────────
 
 function updateText(id, value) {
   const el = document.getElementById(id);
@@ -96,18 +33,64 @@ function getGreeting() {
   return 'Good evening 👋';
 }
 
-/**
- * Count consecutive days (ending today) that have a log entry.
- * @param {Object} logs – { 'YYYY-MM-DD': { ... } }
- * @returns {number}
- */
+function formatDate(dateStr) {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const d = new Date(year, month - 1, day);
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// ── Data Fetching ──────────────────────────────────────────────
+
+async function getProfile(userId) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('user_id', userId)
+    .single();
+
+  if (error) return null;
+  return data;
+}
+
+async function getTodayLog(userId) {
+  const { data, error } = await supabase
+    .from('daily_logs')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('log_date', todayKey())
+    .single();
+
+  if (error) return { calories: 0, protein: 0, carbs: 0, fat: 0, water: 0 };
+  return data;
+}
+
+async function getRecentLogs(userId, limit = 7) {
+  const { data, error } = await supabase
+    .from('daily_logs')
+    .select('*')
+    .eq('user_id', userId)
+    .order('log_date', { ascending: false })
+    .limit(limit);
+
+  if (error) return [];
+  return data;
+}
+
+// ── Streak Calculation ─────────────────────────────────────────
+
 function calculateStreak(logs) {
+  if (!logs || logs.length === 0) return 0;
+
+  // Sort descending by date
+  const sorted = [...logs].sort((a, b) => b.log_date.localeCompare(a.log_date));
+  const dateSet = new Set(sorted.map(l => l.log_date));
+
   let streak = 0;
   const date = new Date();
 
   while (true) {
     const key = date.toISOString().slice(0, 10);
-    if (!logs[key]) break;
+    if (!dateSet.has(key)) break;
     streak++;
     date.setDate(date.getDate() - 1);
   }
@@ -115,36 +98,68 @@ function calculateStreak(logs) {
   return streak;
 }
 
-/** Render the 7 most-recent log entries into #recent-logs-list. */
+// ── Dashboard Render ───────────────────────────────────────────
+
+async function renderDashboard(user) {
+  const profile   = await getProfile(user.id);
+  const todayLog  = await getTodayLog(user.id);
+  const recentLogs = await getRecentLogs(user.id, 30); // Get more for streak calc
+
+  const target = profile?.calorie_target || 2000;
+
+  // Greeting
+  updateText('dash-greeting', getGreeting());
+
+  // Calorie stats
+  updateText('dash-calories-target',    target);
+  updateText('dash-calories-consumed',  todayLog.calories);
+  updateText('dash-calories-remaining', Math.max(0, target - todayLog.calories));
+  setProgressBar('dash-calories-bar', todayLog.calories, target);
+
+  // Macros
+  updateText('dash-protein', todayLog.protein);
+  updateText('dash-carbs',   todayLog.carbs);
+  updateText('dash-fat',     todayLog.fat);
+
+  // Water
+  updateText('dash-water', todayLog.water);
+  setProgressBar('dash-water-bar', todayLog.water, 8);
+
+  // Streak
+  updateText('dash-streak', calculateStreak(recentLogs));
+
+  // Recent logs list (show last 7)
+  renderRecentLogs(recentLogs.slice(0, 7));
+}
+
+// ── Recent Logs Render ─────────────────────────────────────────
+
 function renderRecentLogs(logs) {
   const list = document.getElementById('recent-logs-list');
   if (!list) return;
 
-  const entries = Object.entries(logs)
-    .sort(([a], [b]) => b.localeCompare(a))
-    .slice(0, 7);
-
-  if (entries.length === 0) {
+  if (!logs || logs.length === 0) {
     list.innerHTML = '<li class="text-muted" style="padding:0.85rem 0">No logs yet – start logging today!</li>';
     return;
   }
 
-  list.innerHTML = entries
-    .map(([date, entry]) => `
+  list.innerHTML = logs
+    .map(entry => `
       <li>
-        <span class="date">${formatDate(date)}</span>
+        <span class="date">${formatDate(entry.log_date)}</span>
         <span>${entry.calories} kcal &nbsp;·&nbsp; P: ${entry.protein}g &nbsp;·&nbsp; C: ${entry.carbs}g &nbsp;·&nbsp; F: ${entry.fat}g</span>
       </li>
     `)
     .join('');
 }
 
-function formatDate(dateStr) {
-  const [year, month, day] = dateStr.split('-').map(Number);
-  const d = new Date(year, month - 1, day);
-  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+// ── Init ───────────────────────────────────────────────────────
+
+async function init() {
+  const user = await requireAuth();
+  if (!user) return;
+
+  await renderDashboard(user);
 }
 
-// ── Event Binding ──────────────────────────────────────────────
-
-document.addEventListener('DOMContentLoaded', renderDashboard);
+init();
