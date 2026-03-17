@@ -1,165 +1,227 @@
-/**
- * dashboard.js – Dashboard with Supabase data.
- *
- * Reads profile and daily logs from Supabase to populate
- * all dashboard stat cards, progress bars, and recent logs.
- */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Built Daily</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
 
-import { supabase } from './supabase.js';
-import { requireAuth } from './auth.js';
+  <!-- Header (Authenticated Nav) -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="dashboard.html" class="logo">
+        <span class="logo-mark"></span>
+        Built Daily
+      </a>
+      <nav class="nav-desktop">
+        <a href="dashboard.html" class="active">Dashboard</a>
+        <a href="profile.html">Profile</a>
+        <a href="log.html">Log Food</a>
+        <a href="weight.html">Weight</a>
+        <a href="#" id="logout-btn">Logout</a>
+      </nav>
+      <button class="hamburger" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <nav class="nav-mobile">
+      <a href="dashboard.html" class="active">Dashboard</a>
+      <a href="profile.html">Profile</a>
+      <a href="log.html">Log Food</a>
+      <a href="weight.html">Weight</a>
+      <a href="#" id="logout-btn-mobile">Logout</a>
+    </nav>
+  </header>
 
-// ── Helpers ────────────────────────────────────────────────────
+  <!-- Main -->
+  <main>
+    <div class="container">
 
-function todayKey() {
-  return new Date().toISOString().slice(0, 10);
-}
+      <!-- Dashboard Header -->
+      <div class="dashboard-header animate-in">
+        <p class="dashboard-greeting" id="dash-greeting"></p>
+        <h1>Your Daily Dashboard</h1>
+        <p>Track your progress and stay focused on the habits that move you forward.</p>
+      </div>
 
-function updateText(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = value !== undefined ? value : '–';
-}
+      <!-- Consistency & Streaks -->
+      <div class="stats-grid animate-in delay-1">
 
-function setProgressBar(id, value, max) {
-  const bar = document.getElementById(id);
-  if (!bar || !max) return;
-  const pct = Math.min(100, Math.round((value / max) * 100));
-  bar.style.width = `${pct}%`;
-}
+        <div class="stat-card accent-border">
+          <span class="stat-label">Consistency Score</span>
+          <span class="stat-value" id="dash-consistency">–</span>
+          <div class="progress-track">
+            <div class="progress-bar" id="dash-consistency-bar"></div>
+          </div>
+          <span class="stat-note" id="dash-consistency-label">Last 7 days</span>
+        </div>
 
-function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning 👋';
-  if (hour < 18) return 'Good afternoon 👋';
-  return 'Good evening 👋';
-}
+        <div class="stat-card">
+          <span class="stat-label">Current Streak</span>
+          <span class="stat-value"><span id="dash-streak">0</span> <span class="stat-unit">days</span></span>
+          <span class="stat-note">Consecutive days logged</span>
+        </div>
 
-function formatDate(dateStr) {
-  const [year, month, day] = dateStr.split('-').map(Number);
-  const d = new Date(year, month - 1, day);
-  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-}
+        <div class="stat-card">
+          <span class="stat-label">Best Streak</span>
+          <span class="stat-value"><span id="dash-best-streak">0</span> <span class="stat-unit">days</span></span>
+          <span class="stat-note">Personal record</span>
+        </div>
 
-// ── Data Fetching ──────────────────────────────────────────────
+      </div>
 
-async function getProfile(userId) {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('user_id', userId)
-    .single();
+      <!-- Calorie Stats -->
+      <h3 class="dashboard-section-title animate-in delay-2">Today's Calories</h3>
+      <div class="stats-grid animate-in delay-2">
 
-  if (error) return null;
-  return data;
-}
+        <div class="stat-card accent-border">
+          <span class="stat-label">Daily Calorie Target</span>
+          <span class="stat-value" id="dash-calories-target">–</span>
+          <span class="stat-note">Based on your profile and goal</span>
+        </div>
 
-async function getTodayLog(userId) {
-  const { data, error } = await supabase
-    .from('daily_logs')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('log_date', todayKey())
-    .single();
+        <div class="stat-card">
+          <span class="stat-label">Calories Consumed</span>
+          <span class="stat-value" id="dash-calories-consumed">0</span>
+          <div class="progress-track">
+            <div class="progress-bar" id="dash-calories-bar"></div>
+          </div>
+          <span class="stat-note">Logged today</span>
+        </div>
 
-  if (error) return { calories: 0, protein: 0, carbs: 0, fat: 0, water: 0 };
-  return data;
-}
+        <div class="stat-card">
+          <span class="stat-label">Calories Remaining</span>
+          <span class="stat-value" id="dash-calories-remaining">–</span>
+          <span class="stat-note">Left for today</span>
+        </div>
 
-async function getRecentLogs(userId, limit = 7) {
-  const { data, error } = await supabase
-    .from('daily_logs')
-    .select('*')
-    .eq('user_id', userId)
-    .order('log_date', { ascending: false })
-    .limit(limit);
+      </div>
 
-  if (error) return [];
-  return data;
-}
+      <!-- Macros & Water -->
+      <h3 class="dashboard-section-title animate-in delay-2">Today's Macros & Water</h3>
+      <div class="stats-grid animate-in delay-2">
 
-// ── Streak Calculation ─────────────────────────────────────────
+        <div class="stat-card">
+          <span class="stat-label">Protein</span>
+          <span class="stat-value"><span id="dash-protein">0</span> <span class="stat-unit">g</span></span>
+        </div>
 
-function calculateStreak(logs) {
-  if (!logs || logs.length === 0) return 0;
+        <div class="stat-card">
+          <span class="stat-label">Carbs</span>
+          <span class="stat-value"><span id="dash-carbs">0</span> <span class="stat-unit">g</span></span>
+        </div>
 
-  // Sort descending by date
-  const sorted = [...logs].sort((a, b) => b.log_date.localeCompare(a.log_date));
-  const dateSet = new Set(sorted.map(l => l.log_date));
+        <div class="stat-card">
+          <span class="stat-label">Fat</span>
+          <span class="stat-value"><span id="dash-fat">0</span> <span class="stat-unit">g</span></span>
+        </div>
 
-  let streak = 0;
-  const date = new Date();
+        <div class="stat-card">
+          <span class="stat-label">Water</span>
+          <span class="stat-value"><span id="dash-water">0</span> <span class="stat-unit">glasses</span></span>
+          <div class="progress-track">
+            <div class="progress-bar" id="dash-water-bar"></div>
+          </div>
+          <span class="stat-note">Goal: 8 glasses</span>
+        </div>
 
-  while (true) {
-    const key = date.toISOString().slice(0, 10);
-    if (!dateSet.has(key)) break;
-    streak++;
-    date.setDate(date.getDate() - 1);
-  }
+      </div>
 
-  return streak;
-}
+      <!-- Weight Progress -->
+      <h3 class="dashboard-section-title animate-in delay-3">Weight Progress</h3>
+      <div class="stats-grid animate-in delay-3">
 
-// ── Dashboard Render ───────────────────────────────────────────
+        <div class="stat-card accent-border">
+          <span class="stat-label">Current Weight</span>
+          <span class="stat-value"><span id="dash-weight-current">–</span> <span class="stat-unit">kg</span></span>
+          <span class="stat-note">Most recent weigh-in</span>
+        </div>
 
-async function renderDashboard(user) {
-  const profile   = await getProfile(user.id);
-  const todayLog  = await getTodayLog(user.id);
-  const recentLogs = await getRecentLogs(user.id, 30); // Get more for streak calc
+        <div class="stat-card">
+          <span class="stat-label">Goal Weight</span>
+          <span class="stat-value"><span id="dash-weight-goal">–</span> <span class="stat-unit">kg</span></span>
+          <span class="stat-note">Target from profile</span>
+        </div>
 
-  const target = profile?.calorie_target || 2000;
+        <div class="stat-card">
+          <span class="stat-label">Remaining</span>
+          <span class="stat-value"><span id="dash-weight-remaining">–</span> <span class="stat-unit">kg</span></span>
+          <span class="stat-note">Distance to goal</span>
+        </div>
 
-  // Greeting
-  updateText('dash-greeting', getGreeting());
+        <div class="stat-card">
+          <span class="stat-label">Recent Change</span>
+          <span class="stat-value" id="dash-weight-change">–</span>
+          <span class="stat-note">Last 7 days</span>
+        </div>
 
-  // Calorie stats
-  updateText('dash-calories-target',    target);
-  updateText('dash-calories-consumed',  todayLog.calories);
-  updateText('dash-calories-remaining', Math.max(0, target - todayLog.calories));
-  setProgressBar('dash-calories-bar', todayLog.calories, target);
+      </div>
 
-  // Macros
-  updateText('dash-protein', todayLog.protein);
-  updateText('dash-carbs',   todayLog.carbs);
-  updateText('dash-fat',     todayLog.fat);
+      <!-- Weekly Summary -->
+      <h3 class="dashboard-section-title animate-in delay-3">7-Day Summary</h3>
+      <div class="stats-grid animate-in delay-3">
 
-  // Water
-  updateText('dash-water', todayLog.water);
-  setProgressBar('dash-water-bar', todayLog.water, 8);
+        <div class="stat-card accent-border">
+          <span class="stat-label">Days Logged</span>
+          <span class="stat-value" id="dash-week-days">0/7</span>
+          <span class="stat-note">This week</span>
+        </div>
 
-  // Streak
-  updateText('dash-streak', calculateStreak(recentLogs));
+        <div class="stat-card">
+          <span class="stat-label">Avg Calories</span>
+          <span class="stat-value"><span id="dash-week-calories">–</span> <span class="stat-unit">kcal</span></span>
+          <span class="stat-note">Daily average</span>
+        </div>
 
-  // Recent logs list (show last 7)
-  renderRecentLogs(recentLogs.slice(0, 7));
-}
+        <div class="stat-card">
+          <span class="stat-label">Avg Protein</span>
+          <span class="stat-value"><span id="dash-week-protein">–</span> <span class="stat-unit">g</span></span>
+          <span class="stat-note">Daily average</span>
+        </div>
 
-// ── Recent Logs Render ─────────────────────────────────────────
+        <div class="stat-card">
+          <span class="stat-label">Avg Carbs</span>
+          <span class="stat-value"><span id="dash-week-carbs">–</span> <span class="stat-unit">g</span></span>
+          <span class="stat-note">Daily average</span>
+        </div>
 
-function renderRecentLogs(logs) {
-  const list = document.getElementById('recent-logs-list');
-  if (!list) return;
+        <div class="stat-card">
+          <span class="stat-label">Avg Fat</span>
+          <span class="stat-value"><span id="dash-week-fat">–</span> <span class="stat-unit">g</span></span>
+          <span class="stat-note">Daily average</span>
+        </div>
 
-  if (!logs || logs.length === 0) {
-    list.innerHTML = '<li class="text-muted" style="padding:0.85rem 0">No logs yet – start logging today!</li>';
-    return;
-  }
+      </div>
 
-  list.innerHTML = logs
-    .map(entry => `
-      <li>
-        <span class="date">${formatDate(entry.log_date)}</span>
-        <span>${entry.calories} kcal &nbsp;·&nbsp; P: ${entry.protein}g &nbsp;·&nbsp; C: ${entry.carbs}g &nbsp;·&nbsp; F: ${entry.fat}g</span>
-      </li>
-    `)
-    .join('');
-}
+      <!-- Recent Logs -->
+      <h3 class="dashboard-section-title animate-in delay-4">Recent Logs</h3>
+      <div class="card recent-logs-card animate-in delay-4">
+        <ul class="recent-logs-list" id="recent-logs-list">
+          <li class="text-muted" style="padding:0.85rem 0">Loading…</li>
+        </ul>
+      </div>
 
-// ── Init ───────────────────────────────────────────────────────
+      <!-- CTAs -->
+      <div class="dashboard-cta animate-in delay-5">
+        <a href="log.html" class="btn btn-primary">Log Today's Nutrition</a>
+        <a href="weight.html" class="btn btn-ghost" style="margin-left: var(--space-sm);">Log Weight</a>
+      </div>
 
-async function init() {
-  const user = await requireAuth();
-  if (!user) return;
+    </div>
+  </main>
 
-  await renderDashboard(user);
-}
+  <!-- Footer -->
+  <footer class="site-footer">
+    <p class="footer-name">Built Daily</p>
+    <p class="footer-note">Discipline. Consistency. Progress.</p>
+  </footer>
 
-init();
+  <script src="js/nav.js"></script>
+  <script type="module" src="js/dashboard.js"></script>
+  <script type="module" src="js/auth.js"></script>
+</body>
+</html>
