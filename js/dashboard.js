@@ -1,227 +1,290 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard — Built Daily</title>
-  <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
+/**
+ * dashboard.js – Dashboard with Supabase data.
+ *
+ * Phase 2: Adds weight progress, weekly summary,
+ * consistency score, and best streak tracking.
+ */
 
-  <!-- Header (Authenticated Nav) -->
-  <header class="site-header">
-    <div class="header-inner">
-      <a href="dashboard.html" class="logo">
-        <span class="logo-mark"></span>
-        Built Daily
-      </a>
-      <nav class="nav-desktop">
-        <a href="dashboard.html" class="active">Dashboard</a>
-        <a href="profile.html">Profile</a>
-        <a href="log.html">Log Food</a>
-        <a href="weight.html">Weight</a>
-        <a href="#" id="logout-btn">Logout</a>
-      </nav>
-      <button class="hamburger" aria-label="Toggle navigation">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-    </div>
-    <nav class="nav-mobile">
-      <a href="dashboard.html" class="active">Dashboard</a>
-      <a href="profile.html">Profile</a>
-      <a href="log.html">Log Food</a>
-      <a href="weight.html">Weight</a>
-      <a href="#" id="logout-btn-mobile">Logout</a>
-    </nav>
-  </header>
+import { supabase } from './supabase.js';
+import { requireAuth } from './auth.js';
 
-  <!-- Main -->
-  <main>
-    <div class="container">
+// ── Helpers ────────────────────────────────────────────────────
 
-      <!-- Dashboard Header -->
-      <div class="dashboard-header animate-in">
-        <p class="dashboard-greeting" id="dash-greeting"></p>
-        <h1>Your Daily Dashboard</h1>
-        <p>Track your progress and stay focused on the habits that move you forward.</p>
-      </div>
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
 
-      <!-- Consistency & Streaks -->
-      <div class="stats-grid animate-in delay-1">
+function daysAgoKey(n) {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
 
-        <div class="stat-card accent-border">
-          <span class="stat-label">Consistency Score</span>
-          <span class="stat-value" id="dash-consistency">–</span>
-          <div class="progress-track">
-            <div class="progress-bar" id="dash-consistency-bar"></div>
-          </div>
-          <span class="stat-note" id="dash-consistency-label">Last 7 days</span>
-        </div>
+function updateText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value !== undefined ? value : '–';
+}
 
-        <div class="stat-card">
-          <span class="stat-label">Current Streak</span>
-          <span class="stat-value"><span id="dash-streak">0</span> <span class="stat-unit">days</span></span>
-          <span class="stat-note">Consecutive days logged</span>
-        </div>
+function setProgressBar(id, value, max) {
+  const bar = document.getElementById(id);
+  if (!bar || !max) return;
+  const pct = Math.min(100, Math.round((value / max) * 100));
+  bar.style.width = `${pct}%`;
+}
 
-        <div class="stat-card">
-          <span class="stat-label">Best Streak</span>
-          <span class="stat-value"><span id="dash-best-streak">0</span> <span class="stat-unit">days</span></span>
-          <span class="stat-note">Personal record</span>
-        </div>
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning 👋';
+  if (hour < 18) return 'Good afternoon 👋';
+  return 'Good evening 👋';
+}
 
-      </div>
+function formatDate(dateStr) {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const d = new Date(year, month - 1, day);
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
 
-      <!-- Calorie Stats -->
-      <h3 class="dashboard-section-title animate-in delay-2">Today's Calories</h3>
-      <div class="stats-grid animate-in delay-2">
+// ── Data Fetching ──────────────────────────────────────────────
 
-        <div class="stat-card accent-border">
-          <span class="stat-label">Daily Calorie Target</span>
-          <span class="stat-value" id="dash-calories-target">–</span>
-          <span class="stat-note">Based on your profile and goal</span>
-        </div>
+async function getProfile(userId) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('user_id', userId)
+    .single();
 
-        <div class="stat-card">
-          <span class="stat-label">Calories Consumed</span>
-          <span class="stat-value" id="dash-calories-consumed">0</span>
-          <div class="progress-track">
-            <div class="progress-bar" id="dash-calories-bar"></div>
-          </div>
-          <span class="stat-note">Logged today</span>
-        </div>
+  if (error) return null;
+  return data;
+}
 
-        <div class="stat-card">
-          <span class="stat-label">Calories Remaining</span>
-          <span class="stat-value" id="dash-calories-remaining">–</span>
-          <span class="stat-note">Left for today</span>
-        </div>
+async function getTodayLog(userId) {
+  const { data, error } = await supabase
+    .from('daily_logs')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('log_date', todayKey())
+    .single();
 
-      </div>
+  if (error) return { calories: 0, protein: 0, carbs: 0, fat: 0, water: 0 };
+  return data;
+}
 
-      <!-- Macros & Water -->
-      <h3 class="dashboard-section-title animate-in delay-2">Today's Macros & Water</h3>
-      <div class="stats-grid animate-in delay-2">
+async function getRecentLogs(userId, limit = 30) {
+  const { data, error } = await supabase
+    .from('daily_logs')
+    .select('*')
+    .eq('user_id', userId)
+    .order('log_date', { ascending: false })
+    .limit(limit);
 
-        <div class="stat-card">
-          <span class="stat-label">Protein</span>
-          <span class="stat-value"><span id="dash-protein">0</span> <span class="stat-unit">g</span></span>
-        </div>
+  if (error) return [];
+  return data;
+}
 
-        <div class="stat-card">
-          <span class="stat-label">Carbs</span>
-          <span class="stat-value"><span id="dash-carbs">0</span> <span class="stat-unit">g</span></span>
-        </div>
+async function getRecentWeights(userId, limit = 30) {
+  const { data, error } = await supabase
+    .from('weights')
+    .select('*')
+    .eq('user_id', userId)
+    .order('date', { ascending: false })
+    .limit(limit);
 
-        <div class="stat-card">
-          <span class="stat-label">Fat</span>
-          <span class="stat-value"><span id="dash-fat">0</span> <span class="stat-unit">g</span></span>
-        </div>
+  if (error) return [];
+  return data;
+}
 
-        <div class="stat-card">
-          <span class="stat-label">Water</span>
-          <span class="stat-value"><span id="dash-water">0</span> <span class="stat-unit">glasses</span></span>
-          <div class="progress-track">
-            <div class="progress-bar" id="dash-water-bar"></div>
-          </div>
-          <span class="stat-note">Goal: 8 glasses</span>
-        </div>
+// ── Streak Calculations ────────────────────────────────────────
 
-      </div>
+function calculateCurrentStreak(logs) {
+  if (!logs || logs.length === 0) return 0;
 
-      <!-- Weight Progress -->
-      <h3 class="dashboard-section-title animate-in delay-3">Weight Progress</h3>
-      <div class="stats-grid animate-in delay-3">
+  const dateSet = new Set(logs.map(l => l.log_date));
+  let streak = 0;
+  const date = new Date();
 
-        <div class="stat-card accent-border">
-          <span class="stat-label">Current Weight</span>
-          <span class="stat-value"><span id="dash-weight-current">–</span> <span class="stat-unit">kg</span></span>
-          <span class="stat-note">Most recent weigh-in</span>
-        </div>
+  while (true) {
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    if (!dateSet.has(key)) break;
+    streak++;
+    date.setDate(date.getDate() - 1);
+  }
 
-        <div class="stat-card">
-          <span class="stat-label">Goal Weight</span>
-          <span class="stat-value"><span id="dash-weight-goal">–</span> <span class="stat-unit">kg</span></span>
-          <span class="stat-note">Target from profile</span>
-        </div>
+  return streak;
+}
 
-        <div class="stat-card">
-          <span class="stat-label">Remaining</span>
-          <span class="stat-value"><span id="dash-weight-remaining">–</span> <span class="stat-unit">kg</span></span>
-          <span class="stat-note">Distance to goal</span>
-        </div>
+function calculateBestStreak(logs) {
+  if (!logs || logs.length === 0) return 0;
 
-        <div class="stat-card">
-          <span class="stat-label">Recent Change</span>
-          <span class="stat-value" id="dash-weight-change">–</span>
-          <span class="stat-note">Last 7 days</span>
-        </div>
+  const sorted = [...logs].sort((a, b) => a.log_date.localeCompare(b.log_date));
+  let best = 1;
+  let current = 1;
 
-      </div>
+  for (let i = 1; i < sorted.length; i++) {
+    const prev = new Date(sorted[i - 1].log_date);
+    const curr = new Date(sorted[i].log_date);
+    const diffDays = Math.round((curr - prev) / (1000 * 60 * 60 * 24));
 
-      <!-- Weekly Summary -->
-      <h3 class="dashboard-section-title animate-in delay-3">7-Day Summary</h3>
-      <div class="stats-grid animate-in delay-3">
+    if (diffDays === 1) {
+      current++;
+      if (current > best) best = current;
+    } else if (diffDays > 1) {
+      current = 1;
+    }
+  }
 
-        <div class="stat-card accent-border">
-          <span class="stat-label">Days Logged</span>
-          <span class="stat-value" id="dash-week-days">0/7</span>
-          <span class="stat-note">This week</span>
-        </div>
+  return best;
+}
 
-        <div class="stat-card">
-          <span class="stat-label">Avg Calories</span>
-          <span class="stat-value"><span id="dash-week-calories">–</span> <span class="stat-unit">kcal</span></span>
-          <span class="stat-note">Daily average</span>
-        </div>
+// ── Weekly Summary Calculation ─────────────────────────────────
 
-        <div class="stat-card">
-          <span class="stat-label">Avg Protein</span>
-          <span class="stat-value"><span id="dash-week-protein">–</span> <span class="stat-unit">g</span></span>
-          <span class="stat-note">Daily average</span>
-        </div>
+function calculateWeeklySummary(logs) {
+  const sevenDaysAgo = daysAgoKey(6);
+  const weekLogs = logs.filter(l => l.log_date >= sevenDaysAgo);
 
-        <div class="stat-card">
-          <span class="stat-label">Avg Carbs</span>
-          <span class="stat-value"><span id="dash-week-carbs">–</span> <span class="stat-unit">g</span></span>
-          <span class="stat-note">Daily average</span>
-        </div>
+  if (weekLogs.length === 0) {
+    return {
+      daysLogged: 0,
+      avgCalories: 0,
+      avgProtein: 0,
+      avgCarbs: 0,
+      avgFat: 0,
+    };
+  }
 
-        <div class="stat-card">
-          <span class="stat-label">Avg Fat</span>
-          <span class="stat-value"><span id="dash-week-fat">–</span> <span class="stat-unit">g</span></span>
-          <span class="stat-note">Daily average</span>
-        </div>
+  const sum = (arr, key) => arr.reduce((s, l) => s + (l[key] || 0), 0);
+  const count = weekLogs.length;
 
-      </div>
+  return {
+    daysLogged:  count,
+    avgCalories: Math.round(sum(weekLogs, 'calories') / count),
+    avgProtein:  Math.round(sum(weekLogs, 'protein') / count),
+    avgCarbs:    Math.round(sum(weekLogs, 'carbs') / count),
+    avgFat:      Math.round(sum(weekLogs, 'fat') / count),
+  };
+}
 
-      <!-- Recent Logs -->
-      <h3 class="dashboard-section-title animate-in delay-4">Recent Logs</h3>
-      <div class="card recent-logs-card animate-in delay-4">
-        <ul class="recent-logs-list" id="recent-logs-list">
-          <li class="text-muted" style="padding:0.85rem 0">Loading…</li>
-        </ul>
-      </div>
+// ── Consistency Score ──────────────────────────────────────────
 
-      <!-- CTAs -->
-      <div class="dashboard-cta animate-in delay-5">
-        <a href="log.html" class="btn btn-primary">Log Today's Nutrition</a>
-        <a href="weight.html" class="btn btn-ghost" style="margin-left: var(--space-sm);">Log Weight</a>
-      </div>
+function calculateConsistency(logs) {
+  const sevenDaysAgo = daysAgoKey(6);
+  const weekLogs = logs.filter(l => l.log_date >= sevenDaysAgo);
+  return Math.round((weekLogs.length / 7) * 100);
+}
 
-    </div>
-  </main>
+function getConsistencyLabel(score) {
+  if (score === 100) return 'Locked in';
+  if (score >= 71)  return 'Strong';
+  if (score >= 43)  return 'Slipping';
+  return 'Reset needed';
+}
 
-  <!-- Footer -->
-  <footer class="site-footer">
-    <p class="footer-name">Built Daily</p>
-    <p class="footer-note">Discipline. Consistency. Progress.</p>
-  </footer>
+// ── Dashboard Render ───────────────────────────────────────────
 
-  <script src="js/nav.js"></script>
-  <script type="module" src="js/dashboard.js"></script>
-  <script type="module" src="js/auth.js"></script>
-</body>
-</html>
+async function renderDashboard(user) {
+  const [profile, todayLog, recentLogs, recentWeights] = await Promise.all([
+    getProfile(user.id),
+    getTodayLog(user.id),
+    getRecentLogs(user.id, 30),
+    getRecentWeights(user.id, 30),
+  ]);
+
+  const target = profile?.calorie_target || 2000;
+
+  updateText('dash-greeting', getGreeting());
+
+  updateText('dash-calories-target',    target);
+  updateText('dash-calories-consumed',  todayLog.calories);
+  updateText('dash-calories-remaining', Math.max(0, target - todayLog.calories));
+  setProgressBar('dash-calories-bar', todayLog.calories, target);
+
+  updateText('dash-protein', todayLog.protein);
+  updateText('dash-carbs',   todayLog.carbs);
+  updateText('dash-fat',     todayLog.fat);
+
+  updateText('dash-water', todayLog.water);
+  setProgressBar('dash-water-bar', todayLog.water, 8);
+
+  const currentStreak = calculateCurrentStreak(recentLogs);
+  const bestStreak    = calculateBestStreak(recentLogs);
+  updateText('dash-streak',      currentStreak);
+  updateText('dash-best-streak', bestStreak);
+
+  const consistency = calculateConsistency(recentLogs);
+  updateText('dash-consistency', `${consistency}%`);
+  updateText('dash-consistency-label', getConsistencyLabel(consistency));
+  setProgressBar('dash-consistency-bar', consistency, 100);
+
+  renderWeightProgress(recentWeights, profile);
+
+  const weekly = calculateWeeklySummary(recentLogs);
+  updateText('dash-week-days',     `${weekly.daysLogged}/7`);
+  updateText('dash-week-calories', weekly.avgCalories);
+  updateText('dash-week-protein',  weekly.avgProtein);
+  updateText('dash-week-carbs',    weekly.avgCarbs);
+  updateText('dash-week-fat',      weekly.avgFat);
+
+  renderRecentLogs(recentLogs.slice(0, 7));
+}
+
+function renderWeightProgress(weights, profile) {
+  if (!weights || weights.length === 0) {
+    updateText('dash-weight-current', '–');
+    updateText('dash-weight-goal', profile?.goal_weight ? parseFloat(profile.goal_weight).toFixed(1) : '–');
+    updateText('dash-weight-change', '–');
+    return;
+  }
+
+  const current = parseFloat(weights[0].weight);
+  updateText('dash-weight-current', current.toFixed(1));
+
+  if (profile?.goal_weight) {
+    const goal = parseFloat(profile.goal_weight);
+    updateText('dash-weight-goal', goal.toFixed(1));
+
+    const remaining = Math.abs(current - goal).toFixed(1);
+    updateText('dash-weight-remaining', remaining);
+  }
+
+  const sevenDaysAgo = daysAgoKey(7);
+  const olderEntry = weights.find(w => w.date <= sevenDaysAgo);
+  if (olderEntry) {
+    const change = (current - parseFloat(olderEntry.weight)).toFixed(1);
+    const sign = change > 0 ? '+' : '';
+    updateText('dash-weight-change', `${sign}${change} kg`);
+  } else if (weights.length >= 2) {
+    const oldest = parseFloat(weights[weights.length - 1].weight);
+    const change = (current - oldest).toFixed(1);
+    const sign = change > 0 ? '+' : '';
+    updateText('dash-weight-change', `${sign}${change} kg`);
+  }
+}
+
+function renderRecentLogs(logs) {
+  const list = document.getElementById('recent-logs-list');
+  if (!list) return;
+
+  if (!logs || logs.length === 0) {
+    list.innerHTML = '<li class="text-muted" style="padding:0.85rem 0">No logs yet – start logging today!</li>';
+    return;
+  }
+
+  list.innerHTML = logs
+    .map(entry => `
+      <li>
+        <span class="date">${formatDate(entry.log_date)}</span>
+        <span>${entry.calories} kcal &nbsp;·&nbsp; P: ${entry.protein}g &nbsp;·&nbsp; C: ${entry.carbs}g &nbsp;·&nbsp; F: ${entry.fat}g</span>
+      </li>
+    `)
+    .join('');
+}
+
+async function init() {
+  const user = await requireAuth();
+  if (!user) return;
+
+  await renderDashboard(user);
+}
+
+init();
