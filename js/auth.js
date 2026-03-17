@@ -1,11 +1,11 @@
 /**
- * auth.js – Authentication helpers (signup & login).
+ * auth.js – Authentication (signup, login, logout, route guard).
  *
- * Placeholder functions ready to be wired to a backend
- * (e.g. Supabase Auth, Firebase, or a custom REST API).
+ * Uses Supabase Auth. Keeps the alert UI system for inline
+ * error/success messages instead of browser alerts.
  */
 
-'use strict';
+import { supabase } from './supabase.js';
 
 // ── Helpers ────────────────────────────────────────────────────
 
@@ -27,10 +27,6 @@ function validateEmail(email) {
 
 // ── Signup ─────────────────────────────────────────────────────
 
-/**
- * Handle user registration.
- * @param {Event} event – form submit event
- */
 async function handleSignup(event) {
   event.preventDefault();
   hideAlert('signup-alert');
@@ -40,7 +36,7 @@ async function handleSignup(event) {
   const password = document.getElementById('password').value;
   const confirm  = document.getElementById('confirm-password').value;
 
-  // Basic validation
+  // Validation
   if (!name || !email || !password || !confirm) {
     return showAlert('signup-alert', 'Please fill in all fields.');
   }
@@ -54,17 +50,26 @@ async function handleSignup(event) {
     return showAlert('signup-alert', 'Passwords do not match.');
   }
 
-  // TODO: replace with real backend call, e.g. Supabase
-  // const { data, error } = await supabase.auth.signUp({ email, password });
-  console.log('Signup attempt:', { name, email });
+  // Supabase signup
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { name }
+    }
+  });
 
-  showAlert(
-    'signup-alert',
-    'Account created! Redirecting to your profile…',
-    'success'
-  );
+  if (error) {
+    return showAlert('signup-alert', error.message);
+  }
 
-  // Simulate redirect after successful signup
+  // Check if email confirmation is required
+  if (data?.user?.identities?.length === 0) {
+    return showAlert('signup-alert', 'An account with this email already exists.');
+  }
+
+  showAlert('signup-alert', 'Account created! Redirecting to your profile…', 'success');
+
   setTimeout(() => {
     window.location.href = 'profile.html';
   }, 1500);
@@ -72,10 +77,6 @@ async function handleSignup(event) {
 
 // ── Login ──────────────────────────────────────────────────────
 
-/**
- * Handle user login.
- * @param {Event} event – form submit event
- */
 async function handleLogin(event) {
   event.preventDefault();
   hideAlert('login-alert');
@@ -90,9 +91,14 @@ async function handleLogin(event) {
     return showAlert('login-alert', 'Please enter a valid email address.');
   }
 
-  // TODO: replace with real backend call, e.g. Supabase
-  // const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  console.log('Login attempt:', { email });
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    return showAlert('login-alert', error.message);
+  }
 
   showAlert('login-alert', 'Login successful! Redirecting…', 'success');
 
@@ -103,13 +109,36 @@ async function handleLogin(event) {
 
 // ── Logout ─────────────────────────────────────────────────────
 
+async function handleLogout(event) {
+  if (event) event.preventDefault();
+  await supabase.auth.signOut();
+  window.location.href = 'login.html';
+}
+
+// ── Auth Guard ─────────────────────────────────────────────────
+
 /**
- * Log the current user out and return to the landing page.
+ * Require an active session. If none, redirect to login.
+ * @returns {Object|null} The authenticated user, or null.
  */
-async function handleLogout() {
-  // TODO: await supabase.auth.signOut();
-  console.log('User logged out.');
-  window.location.href = 'index.html';
+export async function requireAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    window.location.href = 'login.html';
+    return null;
+  }
+
+  return session.user;
+}
+
+// ── Redirect if already logged in (for login/signup pages) ────
+
+export async function redirectIfLoggedIn(destination = 'dashboard.html') {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    window.location.href = destination;
+  }
 }
 
 // ── Event Binding ──────────────────────────────────────────────
@@ -121,6 +150,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('login-form');
   if (loginForm) loginForm.addEventListener('submit', handleLogin);
 
+  // Support logout button on desktop and mobile nav
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+
+  const logoutBtnMobile = document.getElementById('logout-btn-mobile');
+  if (logoutBtnMobile) logoutBtnMobile.addEventListener('click', handleLogout);
 });
