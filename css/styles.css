@@ -35,6 +35,16 @@
   --accent-subtle: rgba(52, 211, 153, 0.1);
   --accent-glow: rgba(52, 211, 153, 0.15);
 
+  /* Category accents */
+  --accent-calories: #f59e0b;
+  --accent-protein:  #60a5fa;
+  --accent-carbs:    #2dd4bf;
+  --accent-fat:      #fbbf24;
+  --accent-water:    #22d3ee;
+  --accent-weight:   var(--accent);
+  --accent-workout:  #a78bfa;
+  --accent-warning:  #f87171;
+
   /* Status */
   --red: #f87171;
   --red-subtle: rgba(248, 113, 113, 0.1);
@@ -516,8 +526,30 @@ main {
   margin-top: 2px;
 }
 
+/* Card accent plumbing */
+.stat-card {
+  --card-accent: var(--accent);
+}
+
+.stat-card--calories { --card-accent: var(--accent-calories); }
+.stat-card--protein  { --card-accent: var(--accent-protein); }
+.stat-card--carbs    { --card-accent: var(--accent-carbs); }
+.stat-card--fat      { --card-accent: var(--accent-fat); }
+.stat-card--water    { --card-accent: var(--accent-water); }
+.stat-card--weight   { --card-accent: var(--accent-weight); }
+.stat-card--workout  { --card-accent: var(--accent-workout); }
+.stat-card--warning  { --card-accent: var(--accent-warning); }
+
 .stat-card.accent-border {
-  border-left: 3px solid var(--accent);
+  border-left: 3px solid var(--card-accent);
+}
+
+.stat-card .progress-bar {
+  background: var(--card-accent);
+}
+
+.stat-card.accent-border .stat-card-icon {
+  color: color-mix(in srgb, var(--card-accent) 55%, var(--text-muted));
 }
 
 /* --- Progress Bars --- */
@@ -543,7 +575,15 @@ main {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  --field-accent: var(--accent);
 }
+
+.form-group--calories { --field-accent: var(--accent-calories); }
+.form-group--protein  { --field-accent: var(--accent-protein); }
+.form-group--carbs    { --field-accent: var(--accent-carbs); }
+.form-group--fat      { --field-accent: var(--accent-fat); }
+.form-group--water    { --field-accent: var(--accent-water); }
+.form-group--weight   { --field-accent: var(--accent-weight); }
 
 .form-group + .form-group {
   margin-top: var(--space-md);
@@ -579,8 +619,8 @@ main {
 
 .form-input:focus,
 .form-select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-subtle);
+  border-color: var(--field-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--field-accent) 18%, transparent);
 }
 
 .form-select {
