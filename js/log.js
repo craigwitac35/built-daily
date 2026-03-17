@@ -1,11 +1,12 @@
 /**
- * log.js – Daily nutrition log helpers.
+ * log.js – Daily nutrition log with Supabase storage.
  *
- * Persists daily entries to localStorage keyed by date
- * (swap for a real API / Supabase insert when ready).
+ * Persists daily entries to Supabase `daily_logs` table,
+ * keyed by (user_id, log_date) unique constraint.
  */
 
-'use strict';
+import { supabase } from './supabase.js';
+import { requireAuth } from './auth.js';
 
 // ── Helpers ────────────────────────────────────────────────────
 
@@ -22,11 +23,7 @@ function showLogAlert(message, type = 'error') {
 
 // ── Submit Log ─────────────────────────────────────────────────
 
-/**
- * Validate and save today's nutrition log entry.
- * @param {Event} event – form submit event
- */
-function handleLogSubmit(event) {
+async function handleLogSubmit(event, user) {
   event.preventDefault();
 
   const calories = parseFloat(document.getElementById('log-calories').value);
@@ -37,103 +34,120 @@ function handleLogSubmit(event) {
 
   // Validate
   if ([calories, protein, carbs, fat, water].some(isNaN)) {
-    showLogAlert('Please fill in all fields with valid numbers.');
-    return;
+    return showLogAlert('Please fill in all fields with valid numbers.');
   }
   if (calories < 0 || protein < 0 || carbs < 0 || fat < 0 || water < 0) {
-    showLogAlert('Values cannot be negative.');
-    return;
+    return showLogAlert('Values cannot be negative.');
   }
 
-  const entry = { calories, protein, carbs, fat, water, loggedAt: new Date().toISOString() };
+  // Upsert to Supabase (one entry per user per day)
+  const { error } = await supabase
+    .from('daily_logs')
+    .upsert(
+      {
+        user_id:  user.id,
+        log_date: todayKey(),
+        calories: Math.round(calories),
+        protein:  Math.round(protein),
+        carbs:    Math.round(carbs),
+        fat:      Math.round(fat),
+        water:    Math.round(water),
+      },
+      { onConflict: 'user_id,log_date' }
+    );
 
-  // TODO: insert into backend, e.g. Supabase `daily_logs` table
-  saveLogEntry(todayKey(), entry);
-  console.log('Log saved:', entry);
+  if (error) {
+    return showLogAlert(error.message);
+  }
 
-  showLogAlert('Daily log saved! 🎉', 'success');
+  showLogAlert('Daily log saved!', 'success');
 
-  // Update live calorie remaining display (if present)
-  updateCalorieRemaining(calories);
+  // Show remaining calories
+  await updateCalorieRemaining(user, Math.round(calories));
 
-  // Reset form
-  event.target.reset();
-
+  // Redirect to dashboard after short delay
   setTimeout(() => {
     window.location.href = 'dashboard.html';
   }, 1500);
 }
 
-// ── Persistence ────────────────────────────────────────────────
+// ── Calorie Remaining ──────────────────────────────────────────
 
-/**
- * Save (or overwrite) the log entry for the given date key.
- * @param {string} dateKey – 'YYYY-MM-DD'
- * @param {Object} entry
- */
-function saveLogEntry(dateKey, entry) {
-  let logs = {};
-  try {
-    logs = JSON.parse(localStorage.getItem('bd_logs')) || {};
-  } catch {
-    logs = {};
-  }
-  logs[dateKey] = entry;
-  localStorage.setItem('bd_logs', JSON.stringify(logs));
-}
-
-// ── Live Preview ───────────────────────────────────────────────
-
-/** Update a "calories remaining" badge on the log page. */
-function updateCalorieRemaining(loggedCalories) {
+async function updateCalorieRemaining(user, loggedCalories) {
   const remainingEl = document.getElementById('calories-remaining');
   if (!remainingEl) return;
 
-  try {
-    const profile = JSON.parse(localStorage.getItem('bd_profile')) || {};
-    const target  = profile.calorieTarget || 2000;
-    remainingEl.textContent = Math.max(0, target - loggedCalories);
-  } catch {
-    // Silently ignore
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('calorie_target')
+    .eq('user_id', user.id)
+    .single();
+
+  if (profile && profile.calorie_target) {
+    const remaining = Math.max(0, profile.calorie_target - loggedCalories);
+    remainingEl.textContent = `${remaining} calories remaining today`;
+    remainingEl.style.display = 'block';
   }
 }
 
-/** Pre-fill today's form if an entry already exists. */
-function loadTodayLog() {
-  let logs = {};
-  try {
-    logs = JSON.parse(localStorage.getItem('bd_logs')) || {};
-  } catch {
-    logs = {};
-  }
-  const entry = logs[todayKey()];
-  if (!entry) return;
+// ── Pre-fill Today's Log ───────────────────────────────────────
 
-  const fields = ['calories', 'protein', 'carbs', 'fat', 'water'];
-  fields.forEach(field => {
-    const el = document.getElementById(`log-${field}`);
-    if (el && entry[field] !== undefined) el.value = entry[field];
-  });
+async function loadTodayLog(user) {
+  const { data, error } = await supabase
+    .from('daily_logs')
+    .select('*')
+    .eq('user_id', user.id)
+    .eq('log_date', todayKey())
+    .single();
+
+  if (error || !data) return;
+
+  const fieldMap = {
+    'log-calories': data.calories,
+    'log-protein':  data.protein,
+    'log-carbs':    data.carbs,
+    'log-fat':      data.fat,
+    'log-water':    data.water,
+  };
+
+  for (const [id, value] of Object.entries(fieldMap)) {
+    const el = document.getElementById(id);
+    if (el && value !== null && value !== undefined) {
+      el.value = value;
+    }
+  }
 }
 
-/** Show the user's calorie target on the log page. */
-function showCalorieTarget() {
+// ── Show Calorie Target Info ───────────────────────────────────
+
+async function showCalorieTarget(user) {
   const targetEl = document.getElementById('calorie-target-info');
   if (!targetEl) return;
-  try {
-    const profile = JSON.parse(localStorage.getItem('bd_profile')) || {};
-    if (profile.calorieTarget) targetEl.textContent = `Daily target: ${profile.calorieTarget} kcal`;
-  } catch {
-    // Silently ignore
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('calorie_target')
+    .eq('user_id', user.id)
+    .single();
+
+  if (profile && profile.calorie_target) {
+    targetEl.textContent = `Daily target: ${profile.calorie_target} kcal`;
   }
 }
 
-// ── Event Binding ──────────────────────────────────────────────
+// ── Init ───────────────────────────────────────────────────────
 
-document.addEventListener('DOMContentLoaded', () => {
-  showCalorieTarget();
-  loadTodayLog();
+async function init() {
+  const user = await requireAuth();
+  if (!user) return;
+
+  await showCalorieTarget(user);
+  await loadTodayLog(user);
 
   const logForm = document.getElementById('log-form');
-  if (logForm) logForm.addEventListener('submit', handleLogSubmit);
-});
+  if (logForm) {
+    logForm.addEventListener('submit', (e) => handleLogSubmit(e, user));
+  }
+}
+
+init();
