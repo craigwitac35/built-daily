@@ -287,25 +287,6 @@ main {
 /* Mobile Nav */
 .nav-mobile {
   display: none;
-  position: fixed;
-  top: var(--header-height);
-  left: 0;
-  right: 0;
-  background: var(--bg-section);
-  border-bottom: 1px solid var(--border-subtle);
-  padding: var(--space-md) var(--space-lg) var(--space-lg);
-  transform: translateY(-10px);
-  opacity: 0;
-  pointer-events: none;
-  transition: transform 0.3s var(--ease), opacity 0.3s var(--ease);
-  z-index: 99;
-}
-
-.nav-mobile.open {
-  display: block;
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: auto;
 }
 
 .nav-mobile a {
@@ -963,9 +944,24 @@ main {
 
   .nav-mobile {
     display: block;
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    background: var(--bg-section);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: var(--space-md) var(--space-lg) var(--space-lg);
+    transform: translateY(-10px);
     opacity: 0;
     pointer-events: none;
-    transform: translateY(-10px);
+    transition: transform 0.3s var(--ease), opacity 0.3s var(--ease);
+    z-index: 99;
+  }
+
+  .nav-mobile.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .form-row {
