@@ -88,7 +88,7 @@ async function getRecentWeights(userId, limit = 30) {
     .from('weights')
     .select('*')
     .eq('user_id', userId)
-    .order('date', { ascending: false })
+    .order('logged_at', { ascending: false })
     .limit(limit);
 
   if (error) return [];
@@ -248,16 +248,16 @@ function renderWeightProgress(weights, profile) {
   }
 
   const sevenDaysAgo = daysAgoKey(7);
-  const olderEntry = weights.find(w => w.date <= sevenDaysAgo);
+  const olderEntry = weights.find(w => w.logged_at <= sevenDaysAgo);
   if (olderEntry) {
     const change = (current - parseFloat(olderEntry.weight)).toFixed(1);
     const sign = change > 0 ? '+' : '';
-    updateText('dash-weight-change', `${sign}${change} kg`);
+    updateText('dash-weight-change', `${sign}${change} lbs`);
   } else if (weights.length >= 2) {
     const oldest = parseFloat(weights[weights.length - 1].weight);
     const change = (current - oldest).toFixed(1);
     const sign = change > 0 ? '+' : '';
-    updateText('dash-weight-change', `${sign}${change} kg`);
+    updateText('dash-weight-change', `${sign}${change} lbs`);
   }
 }
 
