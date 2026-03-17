@@ -1,3 +1,10 @@
+/**
+ * supabase.js – Supabase client initialization.
+ *
+ * Provides the shared Supabase client instance used by
+ * auth.js, profile.js, dashboard.js, and log.js.
+ */
+
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const supabaseUrl = 'https://ruhyfgginfsteqoczcpf.supabase.co';
