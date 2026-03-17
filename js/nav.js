@@ -1,24 +1,13 @@
-// ============================================
-// BUILT DAILY — Navigation
-// Hamburger menu toggle
-// ============================================
+/**
+ * supabase.js – Supabase client initialization.
+ *
+ * Provides the shared Supabase client instance used by
+ * auth.js, profile.js, dashboard.js, and log.js.
+ */
 
-document.addEventListener('DOMContentLoaded', () => {
-  const hamburger = document.querySelector('.hamburger');
-  const navMobile = document.querySelector('.nav-mobile');
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-  if (hamburger && navMobile) {
-    hamburger.addEventListener('click', () => {
-      hamburger.classList.toggle('open');
-      navMobile.classList.toggle('open');
-    });
+const supabaseUrl = 'https://ruhyfgginfsteqoczcpf.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1aHlmZ2dpbmZzdGVxb2N6Y3BmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2ODUxODcsImV4cCI6MjA4OTI2MTE4N30.vhB5TXEZsouqR2Hj7GSsF4EAy_fG0mx6USAshuKr2Cw';
 
-    // Close menu when clicking a link
-    navMobile.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        hamburger.classList.remove('open');
-        navMobile.classList.remove('open');
-      });
-    });
-  }
-});
+export const supabase = createClient(supabaseUrl, supabaseKey);
