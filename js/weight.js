@@ -3,6 +3,7 @@
  *
  * Logs weight entries to `weights` table (one per user per day).
  * Displays weight history with change indicators.
+ * Weight is stored and displayed in lbs.
  */
 
 import { supabase } from './supabase.js';
@@ -32,25 +33,40 @@ function showWeightAlert(message, type = 'error') {
 async function handleWeightSubmit(event, user) {
   event.preventDefault();
 
-  const weight = parseFloat(document.getElementById('weight-input').value);
+  const weightLbs = parseFloat(document.getElementById('weight-input').value);
 
-  if (isNaN(weight) || weight <= 0) {
+  if (isNaN(weightLbs) || weightLbs <= 0) {
     return showWeightAlert('Please enter a valid weight.');
   }
-  if (weight < 30 || weight > 300) {
-    return showWeightAlert('Please enter a realistic weight (30–300 kg).');
+  if (weightLbs < 66 || weightLbs > 660) {
+    return showWeightAlert('Please enter a realistic weight (66–660 lbs).');
   }
 
-  const { error } = await supabase
+  const today = todayKey();
+
+  // Check if an entry already exists for today
+  const { data: existing } = await supabase
     .from('weights')
-    .upsert(
-      {
-        user_id: user.id,
-        weight:  weight,
-        date:    todayKey(),
-      },
-      { onConflict: 'user_id,date' }
-    );
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('logged_at', today)
+    .maybeSingle();
+
+  let error;
+  if (existing) {
+    ({ error } = await supabase
+      .from('weights')
+      .update({ weight: weightLbs })
+      .eq('id', existing.id));
+  } else {
+    ({ error } = await supabase
+      .from('weights')
+      .insert({
+        user_id:   user.id,
+        weight:    weightLbs,
+        logged_at: today,
+      }));
+  }
 
   if (error) {
     return showWeightAlert(error.message);
@@ -58,10 +74,10 @@ async function handleWeightSubmit(event, user) {
 
   showWeightAlert('Weight logged!', 'success');
 
-  // Also update current_weight in profiles
+  // Also update current_weight in profiles (stored in lbs)
   await supabase
     .from('profiles')
-    .update({ current_weight: weight })
+    .update({ current_weight: weightLbs })
     .eq('user_id', user.id);
 
   // Refresh history
@@ -78,7 +94,7 @@ async function loadWeightHistory(user) {
     .from('weights')
     .select('*')
     .eq('user_id', user.id)
-    .order('date', { ascending: false })
+    .order('logged_at', { ascending: false })
     .limit(30);
 
   if (error || !data) return;
@@ -107,14 +123,14 @@ function renderWeightHistory(entries) {
         const diff = (entry.weight - prev.weight).toFixed(1);
         const sign = diff > 0 ? '+' : '';
         const cls  = diff < 0 ? 'change-down' : diff > 0 ? 'change-up' : 'change-flat';
-        changeHtml = `<span class="weight-change ${cls}">${sign}${diff} kg</span>`;
+        changeHtml = `<span class="weight-change ${cls}">${sign}${diff} lbs</span>`;
       }
 
       return `
         <li>
-          <span class="date">${formatDate(entry.date)}</span>
+          <span class="date">${formatDate(entry.logged_at)}</span>
           <span class="weight-entry-value">
-            <strong>${parseFloat(entry.weight).toFixed(1)} kg</strong>
+            <strong>${parseFloat(entry.weight).toFixed(1)} lbs</strong>
             ${changeHtml}
           </span>
         </li>
@@ -128,12 +144,12 @@ function renderWeightHistory(entries) {
 async function renderWeightSummary(entries, user) {
   if (!entries || entries.length === 0) return;
 
-  // Current weight (most recent entry)
+  // Current weight (most recent entry, in lbs)
   const current = parseFloat(entries[0].weight);
   const currentEl = document.getElementById('weight-current');
   if (currentEl) currentEl.textContent = current.toFixed(1);
 
-  // Goal weight from profile
+  // Goal weight from profile (stored in lbs)
   const { data: profile } = await supabase
     .from('profiles')
     .select('goal_weight')
@@ -158,11 +174,11 @@ async function renderWeightSummary(entries, user) {
     const totalChange = (current - oldest).toFixed(1);
     const sign = totalChange > 0 ? '+' : '';
     const totalEl = document.getElementById('weight-total-change');
-    if (totalEl) totalEl.textContent = `${sign}${totalChange} kg`;
+    if (totalEl) totalEl.textContent = `${sign}${totalChange} lbs`;
   }
 
   // Pre-fill today's weight if it exists
-  const todayEntry = entries.find(e => e.date === todayKey());
+  const todayEntry = entries.find(e => e.logged_at === todayKey());
   if (todayEntry) {
     const input = document.getElementById('weight-input');
     if (input) input.value = parseFloat(todayEntry.weight).toFixed(1);
