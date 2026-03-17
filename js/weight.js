@@ -110,7 +110,11 @@ function renderWeightHistory(entries) {
   if (!list) return;
 
   if (!entries || entries.length === 0) {
-    list.innerHTML = '<li class="text-muted" style="padding:0.85rem 0">No weight entries yet. Start logging today.</li>';
+    list.innerHTML = `
+      <li style="padding: var(--space-lg) 0; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; text-align: center;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-muted);"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        <span class="text-muted">No weight entries yet — log your first weigh-in above</span>
+      </li>`;
     return;
   }
 
