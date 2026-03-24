@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Built Daily — Track the Habits That Build Real Progress</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* ============================================
+       LANDING PAGE — Scoped Styles
+       Extends the Built Daily design system
+       for a full production landing experience.
+       ============================================ */
+
+    /* --- Landing color overrides (handoff spec) --- */
+    .landing-page {
+      --lp-bg: #0B0F14;
+      --lp-card: #11161C;
+      --lp-text: #FFFFFF;
+      --lp-text-secondary: #AAB2BD;
+      --lp-accent: #E8620A;
+      --lp-accent-hover: #d45808;
+      --lp-border: #1F2933;
+    }
+
+    .landing-page {
+      background: var(--lp-bg);
+    }
+
+    /* --- Hero Section --- */
+    .lp-hero {
+      position: relative;
+      padding: 100px 0 80px;
+      overflow: hidden;
+    }
+
+    .lp-hero::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      right: -100px;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(232, 98, 10, 0.08) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .lp-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -150px;
+      left: -100px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(52, 211, 153, 0.04) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .lp-hero-inner {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 var(--space-lg);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-2xl);
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .lp-hero-content {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+    }
+
+    .lp-hero h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+      font-weight: 700;
+      color: var(--lp-text);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .lp-hero-subtitle {
+      font-size: 1.1rem;
+      color: var(--lp-text-secondary);
+      line-height: 1.7;
+      max-width: 480px;
+    }
+
+    .lp-hero-ctas {
+      display: flex;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+    }
+
+    .lp-btn-accent {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 14px 28px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      line-height: 1;
+      letter-spacing: 0.01em;
+      transition: transform 0.15s var(--ease), box-shadow 0.2s var(--ease), background 0.2s var(--ease);
+      background: var(--lp-accent);
+      color: #ffffff;
+      box-shadow: 0 8px 24px rgba(232, 98, 10, 0.25);
+    }
+
+    .lp-btn-accent:hover {
+      background: var(--lp-accent-hover);
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(232, 98, 10, 0.35);
+    }
+
+    .lp-btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 14px 28px;
+      border-radius: 8px;
+      border: 1px solid var(--lp-border);
+      cursor: pointer;
+      text-decoration: none;
+      line-height: 1;
+      letter-spacing: 0.01em;
+      transition: transform 0.15s var(--ease), border-color 0.2s var(--ease), background 0.2s var(--ease);
+      background: transparent;
+      color: var(--lp-text-secondary);
+    }
+
+    .lp-btn-secondary:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--lp-text);
+      transform: translateY(-2px);
+    }
+
+    /* --- Hero Mockup --- */
+    .lp-hero-mockup {
+      position: relative;
+    }
+
+    .lp-mockup-container {
+      background: var(--lp-card);
+      border: 1px solid var(--lp-border);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.3),
+        0 20px 50px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    .lp-mockup-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--lp-border);
+    }
+
+    .lp-mockup-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .lp-mockup-dot:first-child { background: #f87171; }
+    .lp-mockup-dot:nth-child(2) { background: #fbbf24; }
+    .lp-mockup-dot:nth-child(3) { background: #34d399; }
+
+    .lp-mockup-title {
+      font-family: var(--font-heading);
+      font-size: 0.8rem;
+      color: var(--lp-text-secondary);
+      margin-left: auto;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .lp-mockup-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+    }
+
+    .lp-mockup-stat {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .lp-mockup-stat-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--lp-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .lp-mockup-stat-value {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--lp-text);
+      line-height: 1;
+    }
+
+    .lp-mockup-stat--calories .lp-mockup-stat-value { color: #f59e0b; }
+    .lp-mockup-stat--protein .lp-mockup-stat-value { color: #60a5fa; }
+    .lp-mockup-stat--streak .lp-mockup-stat-value { color: #34d399; }
+
+    .lp-mockup-progress {
+      margin-top: 6px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .lp-mockup-progress-fill {
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    .lp-mockup-stat--calories .lp-mockup-progress-fill {
+      width: 62%;
+      background: #f59e0b;
+    }
+
+    .lp-mockup-stat--protein .lp-mockup-progress-fill {
+      width: 78%;
+      background: #60a5fa;
+    }
+
+    .lp-mockup-stat--streak .lp-mockup-progress-fill {
+      width: 86%;
+      background: #34d399;
+    }
+
+    /* Floating glow behind mockup */
+    .lp-hero-mockup::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      height: 80%;
+      background: radial-gradient(circle, rgba(232, 98, 10, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* --- Value Strip --- */
+    .lp-value-strip {
+      border-top: 1px solid var(--lp-border);
+      border-bottom: 1px solid var(--lp-border);
+      padding: 48px 0;
+      background: rgba(17, 22, 28, 0.4);
+    }
+
+    .lp-value-strip-inner {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 var(--space-lg);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-lg);
+      text-align: center;
+    }
+
+    .lp-value-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .lp-value-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: rgba(232, 98, 10, 0.08);
+      color: var(--lp-accent);
+    }
+
+    .lp-value-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+    }
+
+    .lp-value-text {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--lp-text);
+      letter-spacing: 0.02em;
+    }
+
+    /* --- Section shared styles --- */
+    .lp-section {
+      padding: 100px 0;
+    }
+
+    .lp-section-inner {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 var(--space-lg);
+    }
+
+    .lp-section-label {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: var(--lp-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 12px;
+    }
+
+    .lp-section-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      color: var(--lp-text);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .lp-section-desc {
+      font-size: 1.05rem;
+      color: var(--lp-text-secondary);
+      line-height: 1.7;
+      max-width: 560px;
+    }
+
+    /* --- Features Grid --- */
+    .lp-features {
+      background: var(--lp-bg);
+    }
+
+    .lp-features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 48px;
+    }
+
+    .lp-feature-card {
+      background: var(--lp-card);
+      border: 1px solid var(--lp-border);
+      border-radius: 12px;
+      padding: 32px 28px;
+      transition: transform 0.2s var(--ease), border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+    }
+
+    .lp-feature-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .lp-feature-icon {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      background: rgba(232, 98, 10, 0.08);
+      color: var(--lp-accent);
+    }
+
+    .lp-feature-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+    }
+
+    .lp-feature-title {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 1.15rem;
+      color: var(--lp-text);
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .lp-feature-body {
+      font-size: 0.95rem;
+      color: var(--lp-text-secondary);
+      line-height: 1.65;
+    }
+
+    /* --- Why Built Daily --- */
+    .lp-why {
+      background: rgba(17, 22, 28, 0.4);
+      border-top: 1px solid var(--lp-border);
+      border-bottom: 1px solid var(--lp-border);
+      text-align: center;
+    }
+
+    .lp-why .lp-section-inner {
+      max-width: 720px;
+    }
+
+    .lp-why .lp-section-title {
+      margin-bottom: 24px;
+    }
+
+    .lp-why-body {
+      font-size: 1.05rem;
+      color: var(--lp-text-secondary);
+      line-height: 1.8;
+    }
+
+    .lp-why-body + .lp-why-body {
+      margin-top: 20px;
+    }
+
+    /* --- Product Showcase --- */
+    .lp-showcase {
+      background: var(--lp-bg);
+      text-align: center;
+    }
+
+    .lp-showcase .lp-section-desc {
+      margin: 0 auto 48px;
+    }
+
+    .lp-showcase-container {
+      background: var(--lp-card);
+      border: 1px solid var(--lp-border);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.2),
+        0 24px 56px rgba(0, 0, 0, 0.45);
+      text-align: left;
+    }
+
+    .lp-showcase-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .lp-showcase-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .lp-showcase-card-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--lp-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+
+    .lp-showcase-card-value {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.6rem;
+      color: var(--lp-text);
+      line-height: 1;
+    }
+
+    .lp-showcase-card-note {
+      font-size: 0.8rem;
+      color: var(--text-faint);
+      margin-top: 6px;
+    }
+
+    .lp-showcase-card--cal .lp-showcase-card-value { color: #f59e0b; }
+    .lp-showcase-card--macro .lp-showcase-card-value { color: #60a5fa; }
+    .lp-showcase-card--weight .lp-showcase-card-value { color: #34d399; }
+    .lp-showcase-card--streak .lp-showcase-card-value { color: var(--lp-accent); }
+
+    .lp-showcase-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .lp-showcase-logs {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .lp-showcase-logs-title {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: var(--lp-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 14px;
+    }
+
+    .lp-showcase-log-entry {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 0.85rem;
+    }
+
+    .lp-showcase-log-entry:last-child {
+      border-bottom: none;
+    }
+
+    .lp-showcase-log-date {
+      color: var(--lp-text);
+      font-weight: 600;
+    }
+
+    .lp-showcase-log-detail {
+      color: var(--lp-text-secondary);
+    }
+
+    /* --- Who It's For --- */
+    .lp-audience {
+      background: var(--lp-bg);
+    }
+
+    .lp-audience-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-2xl);
+      align-items: start;
+      margin-top: 48px;
+    }
+
+    .lp-audience-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: clamp(1.4rem, 3vw, 1.9rem);
+      color: var(--lp-text);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .lp-audience-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .lp-audience-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 1rem;
+      color: var(--lp-text-secondary);
+      line-height: 1.6;
+    }
+
+    .lp-audience-check {
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      background: rgba(232, 98, 10, 0.1);
+      color: var(--lp-accent);
+      margin-top: 2px;
+    }
+
+    .lp-audience-check svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      stroke-width: 2.5;
+    }
+
+    /* --- Final CTA --- */
+    .lp-cta {
+      background: rgba(17, 22, 28, 0.5);
+      border-top: 1px solid var(--lp-border);
+      text-align: center;
+      padding: 100px 0 120px;
+    }
+
+    .lp-cta .lp-section-inner {
+      max-width: 600px;
+    }
+
+    .lp-cta .lp-section-title {
+      margin-bottom: 16px;
+    }
+
+    .lp-cta .lp-section-desc {
+      margin: 0 auto 36px;
+    }
+
+    .lp-cta .lp-btn-accent {
+      padding: 16px 36px;
+      font-size: 1rem;
+    }
+
+    /* --- Landing Footer --- */
+    .lp-footer {
+      border-top: 1px solid var(--lp-border);
+      padding: 48px 0;
+      background: var(--lp-bg);
+    }
+
+    .lp-footer-inner {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 var(--space-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .lp-footer-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .lp-footer-brand {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--lp-text-secondary);
+    }
+
+    .lp-footer-copy {
+      font-size: 0.8rem;
+      color: var(--text-faint);
+    }
+
+    .lp-footer-links {
+      display: flex;
+      gap: var(--space-lg);
+    }
+
+    .lp-footer-links a {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--lp-text-secondary);
+      text-decoration: none;
+      transition: color 0.2s var(--ease);
+    }
+
+    .lp-footer-links a:hover {
+      color: var(--lp-text);
+    }
+
+    /* --- Landing Nav override --- */
+    .landing-page .site-header {
+      background: rgba(11, 15, 20, 0.9);
+      height: 70px;
+      border-bottom: 1px solid var(--lp-border);
+    }
+
+    .landing-page .header-inner {
+      height: 70px;
+    }
+
+    .landing-page main {
+      padding-top: 70px;
+    }
+
+    .landing-page .nav-desktop .btn-primary {
+      background: var(--lp-accent);
+      color: #ffffff;
+    }
+
+    .landing-page .nav-desktop .btn-primary:hover {
+      background: var(--lp-accent-hover);
+      color: #ffffff;
+      box-shadow: 0 0 0 4px rgba(232, 98, 10, 0.15);
+    }
+
+    /* --- Animations --- */
+    .lp-fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+    }
+
+    .lp-fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .lp-fade-in.lp-delay-1 { transition-delay: 0.1s; }
+    .lp-fade-in.lp-delay-2 { transition-delay: 0.2s; }
+    .lp-fade-in.lp-delay-3 { transition-delay: 0.3s; }
+    .lp-fade-in.lp-delay-4 { transition-delay: 0.35s; }
+
+    /* --- Responsive --- */
+    @media (max-width: 900px) {
+      .lp-hero-inner {
+        grid-template-columns: 1fr;
+        gap: var(--space-xl);
+        text-align: center;
+      }
+
+      .lp-hero-subtitle {
+        margin: 0 auto;
+      }
+
+      .lp-hero-ctas {
+        justify-content: center;
+      }
+
+      .lp-hero-mockup {
+        max-width: 500px;
+        margin: 0 auto;
+      }
+
+      .lp-value-strip-inner {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-md);
+      }
+
+      .lp-features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .lp-showcase-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .lp-showcase-row {
+        grid-template-columns: 1fr;
+      }
+
+      .lp-audience-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-xl);
+      }
+
+      .lp-footer-inner {
+        flex-direction: column;
+        gap: var(--space-lg);
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 580px) {
+      .lp-hero {
+        padding: 60px 0 60px;
+      }
+
+      .lp-hero-ctas {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .lp-btn-accent,
+      .lp-btn-secondary {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+      }
+
+      .lp-value-strip-inner {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .lp-section {
+        padding: 64px 0;
+      }
+
+      .lp-mockup-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .lp-showcase-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .lp-cta {
+        padding: 64px 0 80px;
+      }
+    }
+  </style>
+</head>
+<body class="landing-page">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-mark"></span>
+        Built Daily
+      </a>
+      <nav class="nav-desktop">
+        <a href="login.html">Log In</a>
+        <a href="signup.html" class="btn btn-primary btn-sm">Sign Up</a>
+      </nav>
+      <button class="hamburger" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <nav class="nav-mobile">
+      <a href="login.html">Log In</a>
+      <a href="signup.html">Sign Up</a>
+    </nav>
+  </header>
+
+  <!-- Main -->
+  <main>
+
+    <!-- ========== SECTION 1: HERO ========== -->
+    <section class="lp-hero">
+      <div class="lp-hero-inner">
+        <div class="lp-hero-content">
+          <h1 class="lp-fade-in">Track the habits that build real progress.</h1>
+          <p class="lp-hero-subtitle lp-fade-in lp-delay-1">
+            Built Daily helps users track nutrition, weight, and consistency in one place so progress stays clear, measurable, and repeatable.
+          </p>
+          <div class="lp-hero-ctas lp-fade-in lp-delay-2">
+            <a href="signup.html" class="lp-btn-accent">Get Started</a>
+            <a href="login.html" class="lp-btn-secondary">View Dashboard</a>
+          </div>
+        </div>
+
+        <div class="lp-hero-mockup lp-fade-in lp-delay-3">
+          <div class="lp-mockup-container">
+            <div class="lp-mockup-header">
+              <span class="lp-mockup-dot"></span>
+              <span class="lp-mockup-dot"></span>
+              <span class="lp-mockup-dot"></span>
+              <span class="lp-mockup-title">Dashboard</span>
+            </div>
+            <div class="lp-mockup-grid">
+              <div class="lp-mockup-stat lp-mockup-stat--calories">
+                <span class="lp-mockup-stat-label">Calories Remaining</span>
+                <span class="lp-mockup-stat-value">1,250</span>
+                <div class="lp-mockup-progress">
+                  <div class="lp-mockup-progress-fill"></div>
+                </div>
+              </div>
+              <div class="lp-mockup-stat lp-mockup-stat--protein">
+                <span class="lp-mockup-stat-label">Protein Goal</span>
+                <span class="lp-mockup-stat-value">140g</span>
+                <div class="lp-mockup-progress">
+                  <div class="lp-mockup-progress-fill"></div>
+                </div>
+              </div>
+              <div class="lp-mockup-stat lp-mockup-stat--streak">
+                <span class="lp-mockup-stat-label">Current Streak</span>
+                <span class="lp-mockup-stat-value">6 Days</span>
+                <div class="lp-mockup-progress">
+                  <div class="lp-mockup-progress-fill"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SECTION 2: VALUE STRIP ========== -->
+    <section class="lp-value-strip">
+      <div class="lp-value-strip-inner">
+        <div class="lp-value-item lp-fade-in">
+          <div class="lp-value-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+          </div>
+          <span class="lp-value-text">Track Nutrition</span>
+        </div>
+        <div class="lp-value-item lp-fade-in lp-delay-1">
+          <div class="lp-value-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          </div>
+          <span class="lp-value-text">Log Weight</span>
+        </div>
+        <div class="lp-value-item lp-fade-in lp-delay-2">
+          <div class="lp-value-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <span class="lp-value-text">Measure Consistency</span>
+        </div>
+        <div class="lp-value-item lp-fade-in lp-delay-3">
+          <div class="lp-value-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <span class="lp-value-text">Build Better Days</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SECTION 3: FEATURES ========== -->
+    <section class="lp-section lp-features">
+      <div class="lp-section-inner">
+        <p class="lp-section-label lp-fade-in">Features</p>
+        <h2 class="lp-section-title lp-fade-in">Everything you need. Nothing you don't.</h2>
+        <p class="lp-section-desc lp-fade-in">Simple tools built around the fundamentals that drive real progress.</p>
+
+        <div class="lp-features-grid">
+          <div class="lp-feature-card lp-fade-in">
+            <div class="lp-feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </div>
+            <h3 class="lp-feature-title">Daily Logging</h3>
+            <p class="lp-feature-body">Track calories, protein, carbs, fat, and water in one place.</p>
+          </div>
+
+          <div class="lp-feature-card lp-fade-in lp-delay-1">
+            <div class="lp-feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            </div>
+            <h3 class="lp-feature-title">Weight Tracking</h3>
+            <p class="lp-feature-body">Log bodyweight over time and keep progress visible.</p>
+          </div>
+
+          <div class="lp-feature-card lp-fade-in lp-delay-2">
+            <div class="lp-feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            </div>
+            <h3 class="lp-feature-title">Personalized Goals</h3>
+            <p class="lp-feature-body">Use profile-based calorie targets built around your stats and activity level.</p>
+          </div>
+
+          <div class="lp-feature-card lp-fade-in lp-delay-3">
+            <div class="lp-feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            </div>
+            <h3 class="lp-feature-title">Consistency Dashboard</h3>
+            <p class="lp-feature-body">See trends, summaries, and daily momentum at a glance.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SECTION 4: WHY BUILT DAILY ========== -->
+    <section class="lp-section lp-why">
+      <div class="lp-section-inner">
+        <p class="lp-section-label lp-fade-in">Philosophy</p>
+        <h2 class="lp-section-title lp-fade-in">Built for consistency.</h2>
+        <p class="lp-why-body lp-fade-in lp-delay-1">
+          Most apps try to do everything. Built Daily focuses on the few things that actually matter most: awareness, consistency, and daily execution.
+        </p>
+        <p class="lp-why-body lp-fade-in lp-delay-2">
+          Instead of overwhelming dashboards and endless complexity, it keeps progress simple, visible, and actionable.
+        </p>
+      </div>
+    </section>
+
+    <!-- ========== SECTION 5: PRODUCT SHOWCASE ========== -->
+    <section class="lp-section lp-showcase">
+      <div class="lp-section-inner">
+        <p class="lp-section-label lp-fade-in">Dashboard</p>
+        <h2 class="lp-section-title lp-fade-in">See your progress clearly.</h2>
+        <p class="lp-section-desc lp-fade-in">
+          Built Daily gives users a clean dashboard that keeps daily progress visible and easy to understand.
+        </p>
+
+        <div class="lp-showcase-container lp-fade-in">
+          <div class="lp-showcase-grid">
+            <div class="lp-showcase-card lp-showcase-card--cal">
+              <p class="lp-showcase-card-label">Calories Today</p>
+              <p class="lp-showcase-card-value">1,840</p>
+              <p class="lp-showcase-card-note">of 2,200 target</p>
+            </div>
+            <div class="lp-showcase-card lp-showcase-card--macro">
+              <p class="lp-showcase-card-label">Protein</p>
+              <p class="lp-showcase-card-value">142g</p>
+              <p class="lp-showcase-card-note">of 180g goal</p>
+            </div>
+            <div class="lp-showcase-card lp-showcase-card--weight">
+              <p class="lp-showcase-card-label">Current Weight</p>
+              <p class="lp-showcase-card-value">183.2</p>
+              <p class="lp-showcase-card-note">lbs &middot; goal 175</p>
+            </div>
+            <div class="lp-showcase-card lp-showcase-card--streak">
+              <p class="lp-showcase-card-label">Weekly Consistency</p>
+              <p class="lp-showcase-card-value">86%</p>
+              <p class="lp-showcase-card-note">6 of 7 days logged</p>
+            </div>
+          </div>
+
+          <div class="lp-showcase-row">
+            <div class="lp-showcase-logs">
+              <p class="lp-showcase-logs-title">Recent Logs</p>
+              <div class="lp-showcase-log-entry">
+                <span class="lp-showcase-log-date">Mar 23</span>
+                <span class="lp-showcase-log-detail">2,180 kcal &middot; P: 156g</span>
+              </div>
+              <div class="lp-showcase-log-entry">
+                <span class="lp-showcase-log-date">Mar 22</span>
+                <span class="lp-showcase-log-detail">1,920 kcal &middot; P: 148g</span>
+              </div>
+              <div class="lp-showcase-log-entry">
+                <span class="lp-showcase-log-date">Mar 21</span>
+                <span class="lp-showcase-log-detail">2,050 kcal &middot; P: 160g</span>
+              </div>
+            </div>
+            <div class="lp-showcase-logs">
+              <p class="lp-showcase-logs-title">Weight Progress</p>
+              <div class="lp-showcase-log-entry">
+                <span class="lp-showcase-log-date">Mar 23</span>
+                <span class="lp-showcase-log-detail">183.2 lbs &middot; <span style="color: #34d399;">-0.4</span></span>
+              </div>
+              <div class="lp-showcase-log-entry">
+                <span class="lp-showcase-log-date">Mar 21</span>
+                <span class="lp-showcase-log-detail">183.6 lbs &middot; <span style="color: #34d399;">-0.8</span></span>
+              </div>
+              <div class="lp-showcase-log-entry">
+                <span class="lp-showcase-log-date">Mar 19</span>
+                <span class="lp-showcase-log-detail">184.4 lbs &middot; <span style="color: #34d399;">-0.3</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SECTION 6: WHO IT'S FOR ========== -->
+    <section class="lp-section lp-audience">
+      <div class="lp-section-inner">
+        <p class="lp-section-label lp-fade-in">Who It's For</p>
+        <div class="lp-audience-grid">
+          <h2 class="lp-audience-title lp-fade-in">
+            Built for people who want structure without the noise.
+          </h2>
+          <div class="lp-audience-list lp-fade-in lp-delay-1">
+            <div class="lp-audience-item">
+              <span class="lp-audience-check">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span>A simpler way to track progress</span>
+            </div>
+            <div class="lp-audience-item">
+              <span class="lp-audience-check">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span>Clear daily accountability</span>
+            </div>
+            <div class="lp-audience-item">
+              <span class="lp-audience-check">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span>A discipline-first approach</span>
+            </div>
+            <div class="lp-audience-item">
+              <span class="lp-audience-check">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span>Focused feedback without clutter</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SECTION 7: FINAL CTA ========== -->
+    <section class="lp-cta">
+      <div class="lp-section-inner">
+        <p class="lp-section-label lp-fade-in">Get Started</p>
+        <h2 class="lp-section-title lp-fade-in">Start building better days.</h2>
+        <p class="lp-section-desc lp-fade-in lp-delay-1">
+          Create your account, track what matters, and stay consistent one day at a time.
+        </p>
+        <div class="lp-fade-in lp-delay-2">
+          <a href="signup.html" class="lp-btn-accent">Create Account</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="lp-footer">
+    <div class="lp-footer-inner">
+      <div class="lp-footer-left">
+        <span class="lp-footer-brand">Built Daily</span>
+        <span class="lp-footer-copy">&copy; 2025 Built Daily. All rights reserved.</span>
+      </div>
+      <nav class="lp-footer-links">
+        <a href="login.html">Login</a>
+        <a href="signup.html">Sign Up</a>
+        <a href="dashboard.html">Dashboard</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="js/nav.js"></script>
+  <script>
+    // Scroll-triggered fade-in animations
+    (function () {
+      const els = document.querySelectorAll('.lp-fade-in');
+      if (!els.length) return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+      );
+
+      els.forEach((el) => observer.observe(el));
+    })();
+  </script>
+</body>
+</html>
