@@ -260,6 +260,20 @@
       background: #34d399;
     }
 
+    /* --- Mockup image styles --- */
+    .lp-mockup-image-wrap {
+      padding: 14px;
+      overflow: hidden;
+    }
+
+    .lp-mockup-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      object-fit: cover;
+    }
+
     /* Floating glow behind mockup */
     .lp-hero-mockup::before {
       content: '';
@@ -826,7 +840,7 @@
   <!-- Header -->
   <header class="site-header">
     <div class="header-inner">
-      <a href="index.html" class="logo">
+      <a href="landing.html" class="logo">
         <span class="logo-mark"></span>
         Built Daily
       </a>
@@ -859,41 +873,13 @@
           </p>
           <div class="lp-hero-ctas lp-fade-in lp-delay-2">
             <a href="signup.html" class="lp-btn-accent">Get Started</a>
-            <a href="login.html" class="lp-btn-secondary">View Dashboard</a>
+            <a href="#features" class="lp-btn-secondary">Learn More</a>
           </div>
         </div>
 
         <div class="lp-hero-mockup lp-fade-in lp-delay-3">
-          <div class="lp-mockup-container">
-            <div class="lp-mockup-header">
-              <span class="lp-mockup-dot"></span>
-              <span class="lp-mockup-dot"></span>
-              <span class="lp-mockup-dot"></span>
-              <span class="lp-mockup-title">Dashboard</span>
-            </div>
-            <div class="lp-mockup-grid">
-              <div class="lp-mockup-stat lp-mockup-stat--calories">
-                <span class="lp-mockup-stat-label">Calories Remaining</span>
-                <span class="lp-mockup-stat-value">1,250</span>
-                <div class="lp-mockup-progress">
-                  <div class="lp-mockup-progress-fill"></div>
-                </div>
-              </div>
-              <div class="lp-mockup-stat lp-mockup-stat--protein">
-                <span class="lp-mockup-stat-label">Protein Goal</span>
-                <span class="lp-mockup-stat-value">140g</span>
-                <div class="lp-mockup-progress">
-                  <div class="lp-mockup-progress-fill"></div>
-                </div>
-              </div>
-              <div class="lp-mockup-stat lp-mockup-stat--streak">
-                <span class="lp-mockup-stat-label">Current Streak</span>
-                <span class="lp-mockup-stat-value">6 Days</span>
-                <div class="lp-mockup-progress">
-                  <div class="lp-mockup-progress-fill"></div>
-                </div>
-              </div>
-            </div>
+          <div class="lp-mockup-container lp-mockup-image-wrap">
+            <img src="images/mock-up.jpg" alt="Built Daily app dashboard" class="lp-mockup-image">
           </div>
         </div>
       </div>
@@ -930,7 +916,7 @@
     </section>
 
     <!-- ========== SECTION 3: FEATURES ========== -->
-    <section class="lp-section lp-features">
+    <section id="features" class="lp-section lp-features">
       <div class="lp-section-inner">
         <p class="lp-section-label lp-fade-in">Features</p>
         <h2 class="lp-section-title lp-fade-in">Everything you need. Nothing you don't.</h2>
@@ -1114,12 +1100,12 @@
     <div class="lp-footer-inner">
       <div class="lp-footer-left">
         <span class="lp-footer-brand">Built Daily</span>
-        <span class="lp-footer-copy">&copy; 2025 Built Daily. All rights reserved.</span>
+        <span class="lp-footer-copy">&copy; 2026 Built Daily. All rights reserved.</span>
       </div>
       <nav class="lp-footer-links">
         <a href="login.html">Login</a>
         <a href="signup.html">Sign Up</a>
-        <a href="dashboard.html">Dashboard</a>
+        <a href="#features">Features</a>
       </nav>
     </div>
   </footer>
