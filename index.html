@@ -60,10 +60,11 @@
       max-width: var(--container-max);
       margin: 0 auto;
       padding: 0 var(--space-lg);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-2xl);
+      display: flex;
+      flex-direction: column;
       align-items: center;
+      text-align: center;
+      gap: var(--space-xl);
       position: relative;
       z-index: 1;
     }
@@ -71,7 +72,9 @@
     .lp-hero-content {
       display: flex;
       flex-direction: column;
+      align-items: center;
       gap: var(--space-lg);
+      max-width: 640px;
     }
 
     .lp-hero h1 {
@@ -87,13 +90,32 @@
       font-size: 1.1rem;
       color: var(--lp-text-secondary);
       line-height: 1.7;
-      max-width: 480px;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    .lp-hero-login {
+      font-size: 0.9rem;
+      color: var(--text-faint);
+    }
+
+    .lp-hero-login a {
+      color: var(--lp-text-secondary);
+      font-weight: 500;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      transition: color 0.2s var(--ease);
+    }
+
+    .lp-hero-login a:hover {
+      color: var(--lp-text);
     }
 
     .lp-hero-ctas {
       display: flex;
       gap: var(--space-sm);
       flex-wrap: wrap;
+      justify-content: center;
     }
 
     .lp-btn-accent {
@@ -154,6 +176,8 @@
     /* --- Hero Mockup --- */
     .lp-hero-mockup {
       position: relative;
+      width: 100%;
+      max-width: 620px;
     }
 
     .lp-mockup-container {
@@ -748,22 +772,11 @@
     /* --- Responsive --- */
     @media (max-width: 900px) {
       .lp-hero-inner {
-        grid-template-columns: 1fr;
-        gap: var(--space-xl);
-        text-align: center;
-      }
-
-      .lp-hero-subtitle {
-        margin: 0 auto;
-      }
-
-      .lp-hero-ctas {
-        justify-content: center;
+        gap: var(--space-lg);
       }
 
       .lp-hero-mockup {
         max-width: 500px;
-        margin: 0 auto;
       }
 
       .lp-value-strip-inner {
@@ -875,6 +888,7 @@
             <a href="signup.html" class="lp-btn-accent">Get Started</a>
             <a href="#features" class="lp-btn-secondary">Learn More</a>
           </div>
+          <p class="lp-hero-login lp-fade-in lp-delay-2">Already have an account? <a href="login.html">Log in here</a></p>
         </div>
 
         <div class="lp-hero-mockup lp-fade-in lp-delay-3">
