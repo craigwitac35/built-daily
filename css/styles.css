@@ -2112,6 +2112,55 @@ grid-template-columns: 1fr;
   line-height: 1.6;
 }
 
+/* --- Glow Effects --- */
+.lp-glow {
+  position: relative;
+  overflow: visible;
+}
+
+.lp-glow::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.lp-glow:hover::after {
+  opacity: 1;
+}
+
+.lp-glow--hero::after {
+  inset: -4px;
+  box-shadow:
+    0 0 40px rgba(232, 98, 10, 0.12),
+    0 0 80px rgba(232, 98, 10, 0.06);
+  opacity: 1;
+}
+
+.lp-glow--calories::after {
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.15), 0 0 60px rgba(245, 158, 11, 0.06);
+}
+
+.lp-glow--protein::after {
+  box-shadow: 0 0 30px rgba(96, 165, 250, 0.15), 0 0 60px rgba(96, 165, 250, 0.06);
+}
+
+.lp-glow--weight::after {
+  box-shadow: 0 0 30px rgba(52, 211, 153, 0.15), 0 0 60px rgba(52, 211, 153, 0.06);
+}
+
+.lp-glow--streak::after {
+  box-shadow: 0 0 30px rgba(232, 98, 10, 0.15), 0 0 60px rgba(232, 98, 10, 0.06);
+}
+
+.lp-glow--step::after {
+  box-shadow: 0 0 25px rgba(232, 98, 10, 0.1), 0 0 50px rgba(232, 98, 10, 0.04);
+}
+
 /* --- Responsive --- */
 @media (max-width: 900px) {
   .lp-hero-inner {
