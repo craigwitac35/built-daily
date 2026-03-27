@@ -1,8 +1,8 @@
 /**
  * dashboard.js – Dashboard with Supabase data.
  *
- * Phase 2: Adds weight progress, weekly summary,
- * consistency score, and best streak tracking.
+ * Phase 1B: Adds macro progress bars, improved empty states,
+ * calories remaining status indicator, and macro target notes.
  */
 
 import { supabase } from './supabase.js';
@@ -44,6 +44,20 @@ function formatDate(dateStr) {
   const [year, month, day] = dateStr.split('-').map(Number);
   const d = new Date(year, month - 1, day);
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// ── Macro Target Estimation ────────────────────────────────────
+// Derives rough macro targets from calorie target using standard splits:
+// Protein: 30% of calories ÷ 4 cal/g
+// Carbs:   40% of calories ÷ 4 cal/g
+// Fat:     30% of calories ÷ 9 cal/g
+
+function estimateMacroTargets(calorieTarget) {
+  return {
+    protein: Math.round((calorieTarget * 0.30) / 4),
+    carbs:   Math.round((calorieTarget * 0.40) / 4),
+    fat:     Math.round((calorieTarget * 0.30) / 9),
+  };
 }
 
 // ── Data Fetching ──────────────────────────────────────────────
@@ -191,33 +205,65 @@ async function renderDashboard(user) {
   ]);
 
   const target = profile?.calorie_target || 2000;
+  const macroTargets = estimateMacroTargets(target);
 
   updateText('dash-greeting', getGreeting());
 
+  // ── Calories ──
   updateText('dash-calories-target',    target);
   updateText('dash-calories-consumed',  todayLog.calories);
-  updateText('dash-calories-remaining', Math.max(0, target - todayLog.calories));
   setProgressBar('dash-calories-bar', todayLog.calories, target);
 
+  // Calories remaining with status
+  const remaining = Math.max(0, target - todayLog.calories);
+  const remainingEl = document.getElementById('dash-calories-remaining');
+  if (remainingEl) {
+    remainingEl.textContent = remaining;
+    // Add status class based on remaining
+    const card = remainingEl.closest('.stat-card');
+    if (card) {
+      card.classList.remove('stat-card--over', 'stat-card--on-track', 'stat-card--low');
+      if (todayLog.calories > target) {
+        card.classList.add('stat-card--over');
+      } else if (remaining < target * 0.15) {
+        card.classList.add('stat-card--low');
+      }
+    }
+  }
+
+  // ── Macros with progress bars ──
   updateText('dash-protein', todayLog.protein);
   updateText('dash-carbs',   todayLog.carbs);
   updateText('dash-fat',     todayLog.fat);
 
+  setProgressBar('dash-protein-bar', todayLog.protein, macroTargets.protein);
+  setProgressBar('dash-carbs-bar',   todayLog.carbs,   macroTargets.carbs);
+  setProgressBar('dash-fat-bar',     todayLog.fat,     macroTargets.fat);
+
+  updateText('dash-protein-note', `${todayLog.protein}g / ${macroTargets.protein}g target`);
+  updateText('dash-carbs-note',   `${todayLog.carbs}g / ${macroTargets.carbs}g target`);
+  updateText('dash-fat-note',     `${todayLog.fat}g / ${macroTargets.fat}g target`);
+
+  // ── Water ──
   updateText('dash-water', todayLog.water);
   setProgressBar('dash-water-bar', todayLog.water, 8);
 
+  // ── Streaks ──
   const currentStreak = calculateCurrentStreak(recentLogs);
   const bestStreak    = calculateBestStreak(recentLogs);
   updateText('dash-streak',      currentStreak);
   updateText('dash-best-streak', bestStreak);
 
+  // ── Consistency ──
   const consistency = calculateConsistency(recentLogs);
   updateText('dash-consistency', `${consistency}%`);
   updateText('dash-consistency-label', getConsistencyLabel(consistency));
   setProgressBar('dash-consistency-bar', consistency, 100);
 
+  // ── Weight ──
   renderWeightProgress(recentWeights, profile);
 
+  // ── Weekly Summary ──
   const weekly = calculateWeeklySummary(recentLogs);
   updateText('dash-week-days',     `${weekly.daysLogged}/7`);
   updateText('dash-week-calories', weekly.avgCalories);
@@ -225,6 +271,7 @@ async function renderDashboard(user) {
   updateText('dash-week-carbs',    weekly.avgCarbs);
   updateText('dash-week-fat',      weekly.avgFat);
 
+  // ── Recent Logs ──
   renderRecentLogs(recentLogs.slice(0, 7));
 }
 
@@ -261,15 +308,20 @@ function renderWeightProgress(weights, profile) {
   }
 }
 
+// ── Improved Empty States ──────────────────────────────────────
+
 function renderRecentLogs(logs) {
   const list = document.getElementById('recent-logs-list');
   if (!list) return;
 
   if (!logs || logs.length === 0) {
     list.innerHTML = `
-      <li style="padding: var(--space-lg) 0; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; text-align: center;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-muted);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        <span class="text-muted">No meals logged yet today</span>
+      <li class="empty-state">
+        <span class="empty-state-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </span>
+        <p>You haven't logged anything yet today.</p>
+        <a href="log.html" class="btn btn-primary btn-sm" style="margin-top: 0.5rem;">Log Your First Meal</a>
       </li>`;
     return;
   }
