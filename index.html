@@ -38,7 +38,7 @@
     <section class="lp-hero">
       <div class="lp-hero-inner">
         <div class="lp-hero-mockup lp-fade-in">
-          <div class="lp-mockup-container lp-mockup-image-wrap">
+          <div class="lp-mockup-container lp-mockup-image-wrap lp-glow lp-glow--hero">
             <img src="images/mock-up.jpg" alt="Built Daily app dashboard" class="lp-mockup-image">
           </div>
         </div>
@@ -139,19 +139,19 @@
         <p class="lp-section-desc lp-fade-in">Three simple steps to start building better habits.</p>
 
         <div class="lp-how-grid">
-          <div class="lp-how-card lp-fade-in">
+          <div class="lp-how-card lp-fade-in lp-glow lp-glow--step">
             <span class="lp-how-step">1</span>
             <h3 class="lp-how-title">Create your profile</h3>
             <p class="lp-how-body">Set your goals and daily targets based on your stats.</p>
           </div>
 
-          <div class="lp-how-card lp-fade-in lp-delay-1">
+          <div class="lp-how-card lp-fade-in lp-delay-1 lp-glow lp-glow--step">
             <span class="lp-how-step">2</span>
             <h3 class="lp-how-title">Track your daily data</h3>
             <p class="lp-how-body">Log nutrition, weight, and consistency in one place.</p>
           </div>
 
-          <div class="lp-how-card lp-fade-in lp-delay-2">
+          <div class="lp-how-card lp-fade-in lp-delay-2 lp-glow lp-glow--step">
             <span class="lp-how-step">3</span>
             <h3 class="lp-how-title">See your progress</h3>
             <p class="lp-how-body">Monitor trends and stay accountable every day.</p>
@@ -185,24 +185,24 @@
 
         <div class="lp-showcase-container lp-fade-in">
           <div class="lp-showcase-grid">
-            <div class="lp-showcase-card lp-showcase-card--cal">
+            <div class="lp-showcase-card lp-showcase-card--cal lp-glow lp-glow--calories">
               <p class="lp-showcase-card-label">Calories Today</p>
-              <p class="lp-showcase-card-value">1,840</p>
+              <p class="lp-showcase-card-value"><span class="lp-counter" data-target="1840" data-format="comma">0</span></p>
               <p class="lp-showcase-card-note">of 2,200 target</p>
             </div>
-            <div class="lp-showcase-card lp-showcase-card--macro">
+            <div class="lp-showcase-card lp-showcase-card--macro lp-glow lp-glow--protein">
               <p class="lp-showcase-card-label">Protein</p>
-              <p class="lp-showcase-card-value">142g</p>
+              <p class="lp-showcase-card-value"><span class="lp-counter" data-target="142" data-suffix="g">0</span></p>
               <p class="lp-showcase-card-note">of 180g goal</p>
             </div>
-            <div class="lp-showcase-card lp-showcase-card--weight">
+            <div class="lp-showcase-card lp-showcase-card--weight lp-glow lp-glow--weight">
               <p class="lp-showcase-card-label">Current Weight</p>
-              <p class="lp-showcase-card-value">183.2</p>
+              <p class="lp-showcase-card-value"><span class="lp-counter" data-target="183.2" data-decimals="1">0</span></p>
               <p class="lp-showcase-card-note">lbs &middot; goal 175</p>
             </div>
-            <div class="lp-showcase-card lp-showcase-card--streak">
+            <div class="lp-showcase-card lp-showcase-card--streak lp-glow lp-glow--streak">
               <p class="lp-showcase-card-label">Weekly Consistency</p>
-              <p class="lp-showcase-card-value">86%</p>
+              <p class="lp-showcase-card-value"><span class="lp-counter" data-target="86" data-suffix="%">0</span></p>
               <p class="lp-showcase-card-note">6 of 7 days logged</p>
             </div>
           </div>
@@ -332,6 +332,62 @@
       );
 
       els.forEach((el) => observer.observe(el));
+    })();
+
+    // Animated counters — numbers count up when scrolled into view
+    (function () {
+      const counters = document.querySelectorAll('.lp-counter');
+      if (!counters.length) return;
+
+      function animateCounter(el) {
+        const target = parseFloat(el.dataset.target);
+        const decimals = parseInt(el.dataset.decimals) || 0;
+        const suffix = el.dataset.suffix || '';
+        const useComma = el.dataset.format === 'comma';
+        const duration = 1600;
+        const start = performance.now();
+
+        function update(now) {
+          const elapsed = now - start;
+          const progress = Math.min(elapsed / duration, 1);
+          // Ease out cubic
+          const ease = 1 - Math.pow(1 - progress, 3);
+          const current = target * ease;
+
+          let display;
+          if (decimals > 0) {
+            display = current.toFixed(decimals);
+          } else {
+            display = Math.round(current).toString();
+          }
+
+          if (useComma) {
+            display = parseInt(display).toLocaleString();
+          }
+
+          el.textContent = display + suffix;
+
+          if (progress < 1) {
+            requestAnimationFrame(update);
+          }
+        }
+
+        requestAnimationFrame(update);
+      }
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              animateCounter(entry.target);
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.3 }
+      );
+
+      counters.forEach((el) => observer.observe(el));
     })();
   </script>
 </body>
